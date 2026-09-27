@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script>
+window.__earlyLog=[];
+window.addEventListener('error',function(e){window.__earlyLog.push('ERROR: '+e.message+' @ '+e.filename+':'+e.lineno)});
+window.addEventListener('unhandledrejection',function(e){window.__earlyLog.push('UNHANDLED REJECTION: '+JSON.stringify(e.reason))});
+var __origConsoleError=console.error,__origConsoleWarn=console.warn;
+console.error=function(){window.__earlyLog.push('console.error: '+Array.prototype.slice.call(arguments).join(' '));__origConsoleError.apply(console,arguments)};
+console.warn=function(){window.__earlyLog.push('console.warn: '+Array.prototype.slice.call(arguments).join(' '));__origConsoleWarn.apply(console,arguments)};
+window.__bootStarted=Date.now();
+window.__dbgLog=function(msg){window.__earlyLog.push(msg);var el=document.getElementById('__dbg');if(el){el.textContent+=msg+"\n";el.scrollTop=el.scrollHeight;var bar=document.getElementById('__dbgBar');if(bar)bar.style.display='block';}};
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#AFD13A" id="themeColorMeta">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<title>Bunny's Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,700..800&family=DM+Sans:wght@400..800&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--app-bg:#AFD13A;--accent:#C6E852;--accent-dark:#557713;--accent-soft:#EAF6CF;--paper:#F4FAE6;--ink:#121410;--ink-soft:#6B7059;--black:#111411;--black-2:#1E211A;--on-black:#F3F7E6;--on-black-soft:#9AA47F;--line:rgba(17,20,17,.1);--danger:#D9536F;--df:'Bricolage Grotesque','Anybody','Archivo Narrow',Impact,sans-serif;--bf:'DM Sans',-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0}
+html,body{background:var(--app-bg);transition:background .25s}
+body{font:500 14px/1.4 var(--bf);color:var(--ink);user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}
+input,textarea{user-select:text;font:inherit;color:inherit}
+::-webkit-scrollbar{display:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+:focus-visible{outline:2px solid #000;outline-offset:2px}
+body.booting .app-shell,body.booting nav,body.onboarding-active .app-shell,body.onboarding-active nav{visibility:hidden}
+body.booting,body.onboarding-active{overflow:hidden}
+.app-shell{max-width:460px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom))}
+.enter{animation:enter .28s both}@keyframes enter{from{opacity:0;transform:translateY(10px)}}
+h1{font:800 28px/1 var(--df);margin:18px 2px 12px}
+.lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;margin:18px 4px 8px}
+.card{background:var(--paper);border-radius:26px;padding:18px;margin-bottom:16px;box-sizing:border-box}
+.card.halo{border:2px solid var(--accent);margin-bottom:18px}
+.card.big{border-radius:34px}
+.blk{background:var(--black);color:var(--on-black)}
+.halo{box-shadow:0 0 0 8px rgba(255,255,255,.28)}
+.row{display:flex;align-items:center;gap:10px}.sp{justify-content:space-between}
+.pill{background:var(--black);color:var(--accent);font-weight:800;font-size:12px;padding:5px 11px;border-radius:999px;white-space:nowrap}
+.pill.lime{background:var(--accent);color:#111}
+.btn{background:var(--black);color:var(--accent);font-weight:800;border-radius:999px;padding:14px 22px;width:100%}
+.btn.lime{background:var(--accent);color:#111}.btn.ghost{background:transparent;border:1.5px solid var(--black);color:var(--ink)}.btn.dng{background:var(--danger);color:#fff}
+.top{display:flex;align-items:center;gap:10px;background:var(--paper);border-radius:34px;padding:10px 12px}
+.top b{font:800 17px var(--df)}.top small{display:block;color:var(--ink-soft);font-size:11.5px;font-weight:600}
+.gear{width:40px;height:40px;border-radius:50%;background:var(--black);color:var(--accent);display:grid;place-items:center;margin-left:auto}
+.av{width:42px;height:42px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;overflow:hidden;flex:none}
+.capsule{position:relative;background:var(--paper);border:1.5px solid var(--black);border-radius:999px;overflow:hidden}
+.capsule::before,.capsule::after{content:"";position:absolute;top:0;bottom:0;width:30px;pointer-events:none;z-index:2}
+.capsule::before{left:0;background:linear-gradient(to right,var(--paper),color-mix(in srgb,var(--paper) 0%,transparent))}
+.capsule::after{right:0;background:linear-gradient(to left,var(--paper),color-mix(in srgb,var(--paper) 0%,transparent))}
+.scroll{display:flex;gap:10px;overflow-x:auto;padding:10px 30px;scroll-padding:0 30px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.mp{padding:9px 16px;border-radius:999px;border:1.5px solid var(--black);font-weight:800;font-size:13px;flex:none;box-sizing:border-box;margin:2px 3px 5px 0;scroll-snap-align:center;background:var(--paper);transform:scale(1)}
+.mp.sel{background:var(--accent);color:#111;border-color:var(--black);transform:scale(1.06)}
+.dc{width:46px;height:46px;border-radius:50%;flex:none;background:var(--paper);font:800 16px var(--df);position:relative;box-sizing:border-box;margin:2px 3px 5px 0;scroll-snap-align:center;box-shadow:2px 2px 0 rgba(17,20,17,.35);transform:translate(0,0) scale(1)}
+.dc.dot::after{content:"";position:absolute;bottom:6px;left:50%;margin-left:-3px;width:6px;height:6px;border-radius:50%;background:var(--accent-dark)}
+.dc.full{background:var(--accent)}.dc.sel{background:var(--black);color:var(--accent);box-shadow:3px 3px 0 var(--accent);transform:translate(-1px,-1px) scale(1.08)}.dc.today{box-shadow:0 0 0 2px var(--black)}
+.moods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mood{background:var(--paper);border-radius:20px;min-height:80px;display:grid;place-items:center;font-size:10.5px;font-weight:800;padding:8px;border:2px solid transparent;text-transform:capitalize}
+.mood.sel{border-color:var(--black);box-shadow:0 0 0 3px var(--accent);transform:scale(1.03)}
+.grp{display:inline-flex;align-items:center;gap:8px;margin:10px 0 6px}
+.rc{width:100%;display:flex;align-items:center;gap:12px;text-align:left;min-height:56px;padding:10px 12px;border-radius:20px;background:var(--paper);margin-bottom:8px;transition:background .25s,color .25s}
+.rc .ic{width:34px;height:34px;border-radius:12px;background:var(--accent-soft);color:var(--accent-dark);display:grid;place-items:center;flex:none}
+.rc .ck{margin-left:auto;width:28px;height:28px;border-radius:50%;border:2px solid #b9bfa5;background:#fff;display:grid;place-items:center;flex:none;color:transparent}
+.rc.done{background:var(--black);color:var(--on-black)}.rc.done .ic{background:var(--accent);color:#111}.rc.done .ck{background:var(--accent);border-color:var(--accent);color:#111}
+.pop .ck{animation:pop .3s}@keyframes pop{50%{transform:scale(1.28)}}
+.sq{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 0}
+.sq i{width:24px;height:24px;border-radius:8px;border:2px solid var(--black);display:grid;place-items:center;flex:none;font-style:normal;font-weight:800}
+.sq.done{color:var(--ink-soft);text-decoration:line-through}.sq.done i{background:var(--accent)}
+.gi{width:100%;border:0;border-bottom:1.5px solid var(--line);background:transparent;padding:9px 2px;margin-bottom:4px}
+.tiles{display:flex;gap:12px;margin-bottom:12px}.tile{flex:1;border-radius:26px;padding:16px;min-height:112px;text-align:left;position:relative;overflow:hidden}
+.tile b{display:block;font:800 17px var(--df)}.tile.l{background:var(--accent)}.tile.k{background:var(--black);color:var(--on-black)}.tile.o{background:var(--accent-dark);color:#fff}
+.notch::before{content:"";position:absolute;top:0;right:0;width:56px;height:52px;background:var(--app-bg);border-bottom-left-radius:26px}
+.notch .chip{position:absolute;top:4px;right:4px;width:40px;height:40px;border-radius:50%;background:var(--black);color:var(--accent);display:grid;place-items:center}
+.ring{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;flex:none}
+.ring div{width:70px;height:70px;border-radius:50%;background:var(--black-2);display:grid;place-items:center;font:800 22px var(--df);text-align:center;line-height:1;color:var(--on-black)}
+.ring small{display:block;font:600 9px var(--bf)}
+.stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #2C3024;font-size:13px}.stat:last-child{border:0}
+.bar{height:12px;border-radius:9px;background:#fff;overflow:hidden;flex:1}.bar i{display:block;height:100%;background:var(--accent);border-right:4px solid var(--black);border-radius:9px}
+.dots{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}.dd{width:24px;height:24px;border-radius:8px;background:#fff;border:2px solid transparent}.dd.on{background:var(--accent)}.dd.t{border-color:var(--black)}
+.cols{display:flex;align-items:flex-end;gap:5px;height:90px;overflow-x:auto}.cols i{width:10px;flex:none;background:var(--accent);border-radius:5px;min-height:4%}.cols i.t{background:var(--black)}
+.sw{width:44px;height:44px;border-radius:16px;border:0}.sw.sel{box-shadow:0 0 0 3px var(--paper),0 0 0 5px #111}
+.seg{display:flex;gap:6px;margin:6px 0}.seg button{flex:1;padding:9px;border-radius:999px;border:1.5px solid var(--black);font-weight:800}.seg .sel{background:var(--black);color:var(--accent)}
+.dowrow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:6px 0}.dowrow button{padding:9px 0;border-radius:12px;border:1.5px solid var(--black);font-weight:800;font-size:12px;transition:background-color .2s var(--ease),color .2s var(--ease),transform .25s var(--spring)}.dowrow .sel{background:var(--black);color:var(--accent);transform:scale(1.05)}
+.inp{width:100%;border-radius:20px;border:0;background:#fff;padding:13px 16px;margin:6px 0}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));width:calc(100% - 32px);max-width:428px;background:rgba(17,20,17,.6);border-radius:999px;display:flex;padding:4px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(255,255,255,.05);-webkit-backdrop-filter:blur(var(--glass-blur,22px)) saturate(var(--glass-vibrancy,190%));backdrop-filter:blur(var(--glass-blur,22px)) saturate(var(--glass-vibrancy,190%));touch-action:none;transition:box-shadow .3s var(--ease),backdrop-filter .25s var(--ease)}
+nav.depth{box-shadow:0 20px 44px rgba(0,0,0,.45),0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.2),inset 0 0 0 1px rgba(255,255,255,.06)}
+@supports not (backdrop-filter:blur(4px)){nav{background:#111411}}
+nav .ind{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/6);border-radius:30px;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -3px 5px rgba(0,0,0,.08);transition:left .45s var(--spring),width .45s var(--spring),top .3s var(--spring),bottom .3s var(--spring),transform .4s var(--spring),box-shadow .3s var(--ease);transform:scale(1);will-change:left,width,top,bottom,transform}
+nav .ind.dragging{transition:left 0s,width 0s,top 0s,bottom 0s,transform .4s var(--spring),box-shadow .3s var(--ease)}
+nav .ind.press{transform:scale(1.16) translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -3px 6px rgba(0,0,0,.1)}
+nav button{flex:1;z-index:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 0;font-size:9.5px;font-weight:800;color:var(--on-black-soft);min-height:52px;transition:color .22s var(--ease)}nav button.on{color:#111}
+#toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111;color:var(--accent);padding:10px 18px;border-radius:999px;font-weight:800;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}#toast.show{opacity:1}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:500;padding:20px}#modal.show{display:grid}
+#modal .box{background:var(--paper);border-radius:26px;padding:22px;max-width:340px;width:100%}#modal .row{margin-top:16px}
+#splash{position:fixed;inset:0;z-index:999;background:var(--app-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .5s,transform .5s}
+#splash.hide{opacity:0;transform:scale(1.04);pointer-events:none}#splash svg{animation:bob 1.1s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(-8px) scale(1.04)}}
+#splash b{font:800 13px var(--df);letter-spacing:2.5px}
+#onb{position:fixed;inset:0;z-index:300;overflow:auto;display:none;background:var(--onb-bg,#BFE0F4);transition:background .4s;--onb-ink:#1B1B22;--onb-lime:#B7DC45}#onb.show{display:block}
+.oc{max-width:460px;margin:0 auto;min-height:100svh;padding:calc(18px + env(safe-area-inset-top)) 22px calc(26px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;color:var(--onb-ink);animation:enter .38s cubic-bezier(.22,1,.36,1)}
+.oc.prev{animation-name:enterp}@keyframes enterp{from{opacity:0;transform:translateX(-22px)}}
+.oc .hd{width:100%;display:flex;align-items:center;gap:12px;height:44px}
+.back{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.7);font-size:20px}
+.pg{flex:1;height:6px;border-radius:9px;background:#fff}.pg i{display:block;height:100%;background:var(--onb-lime);border-radius:9px;transition:width .35s}
+.hl{font:800 44px/.95 var(--df);font-variation-settings:'wdth' 75;letter-spacing:-.02em;text-align:center;margin:26px 0 12px}.hl.xl{font-size:clamp(70px,22vw,92px)}
+.sub{color:#6d6c7b;text-align:center;margin-bottom:10px}
+.ob{background:#1B1B1B;color:#fff;font-weight:700;height:56px;min-width:200px;padding:0 34px;border-radius:999px;margin-top:auto;font-size:16px}.ob:disabled{opacity:.35;pointer-events:none}
+.ol{margin:16px 0 4px;font-weight:600;font-size:15px;text-decoration:underline}
+.bub{background:#fff;border-radius:26px;padding:18px 22px;font:800 24px/1.1 var(--df);flex:1}
+.big{width:100%;text-align:center;border:0;background:transparent;font:800 clamp(44px,14vw,60px) var(--df);caret-color:var(--onb-lime);outline:0;margin:24px 0}
+.err{color:#c0334f;font-weight:600;min-height:20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;margin:26px 0}.grid button{background:#fff;border-radius:22px;aspect-ratio:1;border:2.5px solid transparent;display:grid;place-items:center;transition:transform .2s}.grid .sel{border-color:var(--onb-lime);transform:scale(1.04)}
+.oc.still{animation:none}
+.oc .rc.done{background:var(--accent-dark);color:#fff}.oc .pg i{background:var(--accent-dark)}
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;margin:22px 0 18px}.tgrid button{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700}.tgrid i{display:block;width:100%;aspect-ratio:1;border-radius:20px;border:3px solid transparent;position:relative;transition:transform .2s,border-color .2s}.tgrid i::after{content:"";position:absolute;right:18%;bottom:18%;width:30%;height:30%;border-radius:50%;background:var(--d)}.tgrid .sel i{border-color:#1B1B22;transform:scale(1.06)}
+.ipick{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:6px 0;max-height:176px;overflow:auto;padding:2px}.ipick button{aspect-ratio:1;border-radius:14px;background:var(--accent-soft);color:var(--accent-dark);display:grid;place-items:center;transition:background .2s,color .2s}.ipick button.sel{background:var(--accent-dark);color:#fff}#modal .box{max-height:90vh;overflow:auto}.oc .rc{margin-bottom:10px}.oc .rc{cursor:pointer}.opt{width:100%;background:#fff;border-radius:22px;min-height:64px;padding:12px 18px;text-align:left;border:2px solid transparent;margin-bottom:10px;font-weight:800}.opt.sel{border-color:var(--onb-lime);background:#EEF8DD}
+.sticker{position:absolute;animation:fl 5s ease-in-out infinite alternate}@keyframes fl{to{transform:translateY(-10px) rotate(2deg)}}
+.cf{position:fixed;top:-10px;width:9px;height:14px;animation:fall 2.4s ease-in forwards;pointer-events:none}@keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
+@keyframes wig{30%{transform:rotate(-8deg)}60%{transform:rotate(8deg)}}
+.bun{animation:flt 4.6s ease-in-out infinite}@keyframes flt{50%{transform:translateY(-6px) scale(1.02) rotate(1deg)}}
+
+.rx{margin-left:auto;display:flex;gap:8px}.rx button{width:34px;height:34px;border-radius:12px;background:#fff;display:grid;place-items:center;color:var(--accent-dark)}.rx button.dg{color:var(--danger)}
+.pcard{align-items:center}.pcard-info{flex:1;margin-left:8px;min-width:0}
+.pcard-info>b{font:800 16px var(--df);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard-status{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--on-black-soft);margin-top:3px}
+.pcard-buddy,.pcard-mood{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--on-black-soft);margin-top:3px}
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.calhead button{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);display:grid;place-items:center}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;animation:enter .3s var(--ease) both}
+.calgrid.caldow{margin-bottom:4px}.calgrid.caldow .cw{text-align:center;font-size:10px;font-weight:800;color:var(--ink-soft);text-transform:uppercase}
+.calgrid .cd{aspect-ratio:1;border-radius:12px;background:#fff;display:grid;place-items:center;font:700 12.5px var(--bf);position:relative;transition:background-color .25s var(--ease),color .25s var(--ease),transform .25s var(--spring)}
+.calgrid .cd.empty{background:transparent}
+.calgrid .cd.has::after{content:"";position:absolute;bottom:4px;left:50%;margin-left:-3px;width:5px;height:5px;border-radius:50%;background:var(--accent-dark)}
+.calgrid .cd.sel{background:var(--black);color:var(--accent);transform:scale(1.08)}.calgrid .cd.sel.has::after{background:var(--accent)}
+.calgrid .cd.today{box-shadow:0 0 0 2px var(--black)}
+.evrow{animation:rise .35s var(--ease) both}
+@keyframes moodPop{0%{transform:scale(.8)}55%{transform:scale(1.15)}100%{transform:scale(1.03)}}
+.mood.popm{animation:moodPop .4s var(--spring)}
+/* ---- iOS-style motion ---- */
+.stat b,.ring,.pill,.tile b{font-variant-numeric:tabular-nums}
+:root{--ease:cubic-bezier(.32,.72,0,1);--spring:cubic-bezier(.34,1.56,.64,1)}
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+.enter{animation:enter .35s var(--ease) both}@keyframes enter{from{opacity:0;transform:translateY(8px)}}
+.enter .rc,.enter .card{animation:rise .5s var(--ease) both}@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+.enter .rc:nth-child(2),.enter .card:nth-child(2){animation-delay:0.070s}.enter .rc:nth-child(3),.enter .card:nth-child(3){animation-delay:0.105s}.enter .rc:nth-child(4),.enter .card:nth-child(4){animation-delay:0.140s}.enter .rc:nth-child(5),.enter .card:nth-child(5){animation-delay:0.175s}.enter .rc:nth-child(6),.enter .card:nth-child(6){animation-delay:0.210s}.enter .rc:nth-child(7),.enter .card:nth-child(7){animation-delay:0.245s}.enter .rc:nth-child(8),.enter .card:nth-child(8){animation-delay:0.280s}
+.oc{animation:ocIn .45s var(--ease) both}@keyframes ocIn{from{opacity:0;transform:translateX(24px)}}
+.oc.prev{animation-name:ocPrev}@keyframes ocPrev{from{opacity:0;transform:translateX(-24px)}}
+button[data-action]{transition:scale .3s var(--spring),background-color .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease),box-shadow .3s var(--ease),opacity .2s}
+button[data-action]:active{scale:.965;transition-duration:.12s}
+.pop .ck{animation:pop .45s var(--spring)}@keyframes pop{0%{transform:scale(.55)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+.pop .ic{animation:icb .42s var(--ease)}@keyframes icb{40%{transform:scale(.86)}}
+.ring{transition:--ang .7s var(--ease)}
+.bar i{transition:width .6s var(--ease)}
+.dd,.dc,.mp,.mood{transition:background-color .25s var(--ease),color .25s var(--ease),box-shadow .25s var(--ease),transform .3s var(--spring)}
+#modal{display:grid;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .28s var(--ease),visibility 0s .28s}
+#modal.show{visibility:visible;opacity:1;pointer-events:auto;transition:opacity .28s var(--ease)}
+#modal .box{transform:translateY(28px) scale(.97);transition:transform .5s var(--spring)}
+#modal.show .box{transform:none}
+#toast{top:calc(12px + env(safe-area-inset-top));bottom:auto;transform:translate(-50%,-160%);transition:transform .5s var(--spring),opacity .3s var(--ease)}#toast.show{transform:translate(-50%,0)}
+nav button{position:relative;min-width:0}nav button span{font-size:8.5px}nav button.bd:after{content:"";position:absolute;top:7px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#F0567A;border:2px solid #111}
+.pcode{font:800 38px var(--df);letter-spacing:6px;text-align:center;margin:10px 0}.odot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#9aa;margin-right:6px}.odot.on{background:#3DBE6B;box-shadow:0 0 0 rgba(61,190,107,.5);animation:pulse 2s infinite}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,190,107,.5)}70%{box-shadow:0 0 0 7px rgba(61,190,107,0)}100%{box-shadow:0 0 0 0 rgba(61,190,107,0)}}
+.pbar{background:rgba(255,255,255,.28);border-radius:10px;height:9px;overflow:hidden;flex:1}.pbar i{display:block;height:100%;background:var(--black);border-radius:10px;transition:width .5s var(--ease)}.oc .pbar i,.card.blk .pbar i{background:var(--accent)}
+.pseg{display:flex;align-items:center;gap:10px;padding:9px 0}.pseg b{width:64px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:800;flex:none}.pseg span{width:34px;text-align:right;font:800 12px var(--df);flex:none}
+.evrow{display:flex;align-items:center;gap:10px;padding:7px 0}.evrow .ic{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);display:grid;place-items:center;flex:none}.evrow b{flex:1;font-weight:700;font-size:13.5px}
+.note{background:#FFF3B0;border-radius:4px 16px 16px 16px;padding:12px 14px;margin-bottom:8px;font-weight:700;font-size:13.5px;transform:rotate(-.6deg);box-shadow:0 3px 8px rgba(0,0,0,.08)}.note:nth-child(even){transform:rotate(.7deg);background:#FFE1EC}
+.vs{display:flex;align-items:center;gap:10px;margin-bottom:12px}.vs .vc{flex:1;background:var(--paper);border-radius:22px;padding:14px;text-align:center}.vs .vc b{display:block;font:800 26px var(--df)}.vs .vc small{color:var(--ink-soft);font-weight:700;font-size:10.5px;text-transform:uppercase}.vs .vmid{font:800 12px var(--df);color:var(--ink-soft);flex:none}
+.pbn{background:var(--accent-soft);border-radius:18px;padding:10px 14px;margin:10px 0;font-weight:700;font-size:13px}.sk{height:14px;border-radius:8px;background:rgba(0,0,0,.08);margin:10px 0;animation:skp 1.2s infinite alternate}@keyframes skp{to{opacity:.4}}
+.hop{animation:hp .7s}@keyframes hp{30%{transform:translateY(-14px) rotate(-6deg)}60%{transform:translateY(0)}}@media (prefers-reduced-motion:reduce){.sk,.hop{animation:none}}
+.pt{min-height:44px}
+.fxrow p{color:var(--ink-soft);font-size:12.5px;font-weight:600;margin:2px 0 10px;line-height:1.35}
+.fxrow b{font:800 15px var(--df);display:block}
+.fic{width:34px;height:34px;border-radius:12px;background:var(--accent-soft);color:var(--accent-dark);display:grid;place-items:center;flex:none}
+.rng{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(to right,var(--accent-dark) 0%,var(--accent-dark) var(--val,50%),rgba(0,0,0,.12) var(--val,50%),rgba(0,0,0,.12) 100%);outline:0;margin-top:2px}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--black);box-shadow:0 2px 4px rgba(0,0,0,.25);cursor:pointer;transition:transform .2s var(--spring)}
+.rng::-webkit-slider-thumb:active{transform:scale(1.15)}
+.rng::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--black);box-shadow:0 2px 4px rgba(0,0,0,.25);cursor:pointer}
+.rng::-moz-range-track{background:transparent}
+.toggle{width:50px;height:30px;border-radius:16px;background:#d8dbc9;position:relative;flex:none;transition:background-color .25s var(--ease)}
+.toggle i{position:absolute;top:2px;left:2px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.25);display:grid;place-items:center;color:var(--accent-dark);transition:transform .35s var(--spring)}
+.toggle.on{background:var(--accent)}
+.toggle.on i{transform:translateX(20px)}
+</style></head>
+<body class="booting">
+<div id="splash"><svg width="96" height="96" viewBox="0 0 96 96"><path d="M8 52a40 40 0 0 1 80 0z" fill="#111"/><path d="M8 60a40 40 0 0 0 80 0z" fill="#C6E852"/><path d="M8 60h40v0a40 40 0 0 1-40 0z" fill="#557713"/></svg><b>BUNNY'S PLANNER</b></div>
+<div id="onb"></div>
+<div class="app-shell"><div id="main"></div></div>
+<nav id="nav"><i class="ind" id="ind"></i></nav>
+<div id="toast" role="status" aria-live="polite"></div><div id="modal"></div>
+<script>
+(function(){"use strict";
+/* ===== PASTE FIREBASE CONFIG HERE ===== */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAUT_k7_uBgG2w7XilarQmcYRW952IPsKw",
+  authDomain: "bunnybuddy-6622c.firebaseapp.com",
+  projectId: "bunnybuddy-6622c",
+  storageBucket: "bunnybuddy-6622c.firebasestorage.app",
+  messagingSenderId: "826013636032",
+  appId: "1:826013636032:web:2ff1b7dd82a8754dcf2425"
+};
+/* Firebase Console > Project settings > Cloud Messaging > Web Push certificates > generate key pair, paste it here */
+var VAPID_KEY = "PASTE_YOUR_VAPID_PUBLIC_KEY_HERE";
+/* ======================================= */
+var THEMES=[["bunnygreen","Bunny Green","#B5D93F","#AFD13A","#C6E852","#557713","#EAF6CF","198,232,82"],["pink","Pink","#F3A9C4","#F4B6D0","#F7A8C8","#C94F85","#FCE4EE","247,168,200"],["purple","Purple","#B18AE0","#C9B0F0","#D2B8F7","#7A4CC0","#EEE3FC","210,184,247"],["blue","Blue","#6FB2E8","#A9D4F5","#B4DBFA","#2F78B8","#DDEEFC","180,219,250"],["lavender","Lavender","#B9A9E8","#D5C9F5","#DDD2FA","#7D66C4","#EEE9FC","221,210,250"],["peach","Peach","#F4B393","#F7C6A6","#F9CFB2","#C9682F","#FCE8DA","249,207,178"],["yellow","Yellow","#F4C84C","#F5D96A","#F8E27D","#8F6A0C","#FCF3CF","248,226,125"],["red","Red","#E8746F","#F2A9A4","#F5B5B0","#B8362E","#FBDCDA","245,181,176"]];
+var LIBRARY=[["wake","wake up on time 6:30","m","alarm","sleep"],["water_morning","drink water morning","m","water","hydration"],["breakfast","breakfast on time","m","dot","meals"],["packlunch","pack lunch","m","dot","chores"],["water_school","drink water school","s","water","hydration"],["water_midday","drink water midday","s","water","hydration"],["snack","break snack","s","dot","meals"],["water_afternoon","drink water afternoon","s","water","hydration"],["lunchtime","lunch on time","s","dot","meals"],["restroom","restroom after school","s","dot","chores"],["study","study or homework","s","dot","study"],["english","english class friday","s","dot","study"],["freetime","free time evening","e","star","mindfulness"],["workout","workout in the evening","e","bolt","movement"],["water_evening","drink water evening","e","water","hydration"],["dinner","dinner on time","e","dot","meals"],["skincare","skincare","e","star","skincare"],["backpack","pack your backpack","e","dot","chores"],["preparebed","prepare for bed","e","moon","sleep"],["sleep","sleep on time 21:30","e","moon","sleep"],
+["stretch_morning","morning stretch","m","bolt","movement"],["meditate_morning","5-minute meditation","m","star","mindfulness"],["make_bed","make your bed","m","dot","chores"],["vitamins","take vitamins","m","dot","meals"],["plan_day","plan today's priorities","m","dot","work"],["shower_morning","morning shower","m","dot","skincare"],["read_morning","read for 10 minutes","m","dot","mindfulness"],
+["walk_break","walking break","s","bolt","movement"],["deep_work","focused work block","s","dot","work"],["team_checkin","team check-in","s","dot","work"],["screen_break","screen-free break","s","dot","screentime"],["tidy_desk","tidy your desk","s","dot","chores"],["journal_midday","journal a few lines","s","star","mindfulness"],["water_work","drink water at work","s","water","hydration"],
+["cook_dinner","cook a home meal","e","dot","meals"],["unwind","wind-down time, no screens","e","star","mindfulness"],["tidy_space","tidy your space","e","dot","chores"],["plan_tomorrow","plan tomorrow","e","dot","work"],["limit_screens","put screens away","e","moon","screentime"],["stretch_evening","evening stretch","e","bolt","movement"],["gratitude_note","write something you're grateful for","e","star","mindfulness"]];
+var ICOMAP={wake:"sun",water_morning:"water",breakfast:"cup",packlunch:"bag",water_school:"water",water_midday:"water",snack:"apple",water_afternoon:"water",lunchtime:"bowl",restroom:"roll",study:"book",english:"pencil",freetime:"music",workout:"dumbbell",water_evening:"water",dinner:"bowl",skincare:"flower",backpack:"bag",preparebed:"bed",sleep:"moon",stretch_morning:"bolt",meditate_morning:"smile",make_bed:"bed",vitamins:"pill",plan_day:"clip",shower_morning:"sparkle",read_morning:"book",walk_break:"leaf",deep_work:"laptop",team_checkin:"chat",screen_break:"phone",tidy_desk:"sparkle",journal_midday:"pencil",water_work:"water",cook_dinner:"bowl",unwind:"leaf",tidy_space:"house",plan_tomorrow:"clip",limit_screens:"phone",stretch_evening:"heart",gratitude_note:"heart"};LIBRARY.forEach(function(r){if(ICOMAP[r[0]])r[3]=ICOMAP[r[0]]});
+var ORIGINAL_IDS=["wake","water_morning","breakfast","packlunch","water_school","water_midday","snack","water_afternoon","lunchtime","restroom","study","english","freetime","workout","water_evening","dinner","skincare","backpack","preparebed","sleep"];
+var DEFAULT_IDS=["wake","water_morning","breakfast","water_school","lunchtime","study","water_evening","dinner","sleep"];
+var DAYTYPES=[["student","Student","study"],["9to5","9-to-5","work"],["shift","Shift work","work"],["home","Stay at home","chores"],["other","Something else",null]];
+var CATS=[["hydration","hydration"],["movement","movement"],["study","study"],["sleep","sleep"],["skincare","skincare"],["meals","meals"],["mindfulness","mindfulness"],["chores","chores"],["screentime","screen time"],["work","work"]];
+var GN={m:"morning",s:"school day",e:"evening"},SC=[["water","drink enough water daily"],["eat","eat properly"],["rest","rest when tired"],["sleeptime","sleep on time"]],TK=[["syllabus","finish syllabus"],["examprep","exam prep"],["projects","projects"],["goals","personal goals"]];
+var MO=[["happy","#F5C85C"],["loved","#F3A9C4"],["sad","#7CB8E8"],["meh","#A9D17E"],["worried","#F2B36D"],["stormy","#9D8ED8"]];
+var MOUTH=["M-9 5Q0 14 9 5","M-6 6Q0 10 6 6","M-8 10Q0 3 8 10","M-7 7H7","M-8 8Q-4 4 0 8T8 8","M-5 8Q0 5 5 8"];
+var TINTS=[["meadow","#86C13B"],["blush","#F3A9C4"],["sky","#7CB8E8"],["sun","#F5C85C"],["lilac","#9D8ED8"],["charcoal","#4A4C3A"]];
+var NAMES=["Mochi","Biscuit","Clover","Pip","Waffles","Nibbles","Poppy","Sprout","Marshmallow","Button","Tofu","Pudding"];
+var MN=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"],MF=["January","February","March","April","May","June","July","August","September","October","November","December"];
+var NOW=new Date(),RM=NOW.getMonth(),RD=NOW.getDate(),YEAR=NOW.getFullYear();
+function pad2(n){return n<10?"0"+n:""+n}
+function dateKeyOf(y,m,d){return y+"-"+pad2(m+1)+"-"+pad2(d)}
+function localDateKey(d){d=d||new Date();return dateKeyOf(d.getFullYear(),d.getMonth(),d.getDate())}
+var TODAY_KEY=localDateKey(NOW);
+function checkDayRollover(){var k=localDateKey(new Date());if(k!==TODAY_KEY){if(window.__dbgLog)window.__dbgLog("day rolled over ("+TODAY_KEY+" -> "+k+"), reloading");location.reload()}}
+var K={d:"bunnyPlanner:v1",t:"bunnyPlanner:theme",f:"bunnyPlanner:progressFormat",p:"bunnyPlannerProfile_v1",fx:"bunnyPlanner:glassFx"};
+var data={months:{}},state={view:"home",m:RM,d:RD,theme:"bunnygreen",fmt:"percent",pop:null,last:"",
+ fx:{vibrancy:190,blur:22,depth:1},
+ profile:{displayName:"",buddyName:"",avatarId:null,onboardingComplete:false,routines:[]},onb:{step:"welcome",dir:"next",err:"",goalsStage:"day",dayType:null,cats:[],sel:{},custom:[]}};
+var main=document.getElementById("main"),onbEl=document.getElementById("onb");
+function ls(k,v){try{if(v===undefined){return localStorage.getItem(k)}localStorage.setItem(k,v)}catch(e){return null}}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function dim(i){return new Date(YEAR,i+1,0).getDate()}
+function arr(n,v){var a=[],i;for(i=0;i<n;i++)a.push(v);return a}
+function emptyMonth(){var m={routines:{},mood:arr(31,null),grateful:["","","",""],selfcare:{},tasks:{}};return heal(m)}
+function heal(m){(state.profile.routines||[]).forEach(function(r){if(!m.routines)m.routines={};if(!m.routines[r[0]])m.routines[r[0]]=arr(31,false)});if(!m.mood)m.mood=arr(31,null);if(!m.grateful)m.grateful=["","","",""];if(!m.selfcare)m.selfcare={};if(!m.tasks)m.tasks={};SC.forEach(function(s){m.selfcare[s[0]]=!!m.selfcare[s[0]]});TK.forEach(function(s){m.tasks[s[0]]=!!m.tasks[s[0]]});return m}
+function gm(i){if(!data.months)data.months={};if(!data.months[i])data.months[i]=emptyMonth();return heal(data.months[i])}
+function save(){ls(K.d,JSON.stringify(data));if(window.__dbgLog)window.__dbgLog('save(): local data changed');if(window.__P)__P.changed()}
+function saveProfile(){ls(K.p,JSON.stringify(state.profile));if(window.__P)__P.changed()}
+function load(){try{var d=JSON.parse(ls(K.d)||"null");if(d&&d.months)data=d}catch(e){}try{var p=JSON.parse(ls(K.p)||"null");if(p)for(var k in p)state.profile[k]=p[k]}catch(e){}if(state.profile.onboardingComplete&&(!state.profile.routines||!state.profile.routines.length)){state.profile.routines=idsToRoutines(ORIGINAL_IDS);saveProfile()}(state.profile.routines||[]).forEach(function(r){if(ICOMAP[r[0]]&&!r[4])r[3]=ICOMAP[r[0]]});var f=ls(K.f);if(f)state.fmt=f;applyTheme(ls(K.t)||"bunnygreen");try{var fx=JSON.parse(ls(K.fx)||"null");if(fx)for(var kx in fx)state.fx[kx]=fx[kx]}catch(e){}applyFx(state.fx)}
+function mix(h){var n=parseInt(h.slice(1),16),c=[n>>16,(n>>8)&255,n&255].map(function(v){return Math.round((v+255)/2)});return"rgb("+c.join(",")+")"}
+function applyTheme(id){var t=THEMES.filter(function(x){return x[0]===id})[0]||THEMES[0],s=document.documentElement.style;state.theme=t[0];s.setProperty("--app-bg",t[3]);s.setProperty("--accent",t[4]);s.setProperty("--accent-dark",t[5]);s.setProperty("--accent-soft",t[6]);s.setProperty("--paper",mix(t[6]));document.getElementById("themeColorMeta").setAttribute("content",t[3])}
+function applyFx(fx){var n=document.getElementById("nav");if(!n)return;n.style.setProperty("--glass-blur",fx.blur+"px");n.style.setProperty("--glass-vibrancy",fx.vibrancy+"%");n.classList.toggle("depth",!!fx.depth)}
+function saveFx(){ls(K.fx,JSON.stringify(state.fx))}
+/* computations */
+function pct(n){return Math.round(n*100)}
+function dayDone(m,d){var c=0;(state.profile.routines||[]).forEach(function(r){if(m.routines[r[0]]&&m.routines[r[0]][d-1])c++});return c}
+function monthTotal(m,i){var c=0,d;for(d=1;d<=dim(i);d++)c+=dayDone(m,d);return c}
+function fmt(a,b){return state.fmt==="fraction"?a+"/"+b:(b?pct(a/b):0)+"%"}
+function rlen(){return(state.profile.routines||[]).length||1}
+/* day-of-week aware routine scheduling: routine[5] is a list of weekday numbers (0=Sun..6=Sat) it repeats on, or null/undefined/[] for every day */
+function routineOnDay(r,y,mi,d){var days=r[5];if(!days||!days.length)return true;return days.indexOf(new Date(y,mi,d).getDay())>=0}
+function activeRoutines(y,mi,d){return(state.profile.routines||[]).filter(function(r){return routineOnDay(r,y,mi,d)})}
+function activeCount(y,mi,d){return activeRoutines(y,mi,d).length||1}
+function monthExpected(i){var t=0,d,n=dim(i);for(d=1;d<=n;d++)t+=activeCount(YEAR,i,d);return t||1}
+function streak(m,upto,mi){mi=mi===undefined?RM:mi;var s=0,d;for(d=upto;d>=1;d--){if(dayDone(m,d)===activeCount(YEAR,mi,d))s++;else break}return s}
+function rStats(m,id,i){var r=(state.profile.routines||[]).filter(function(x){return x[0]===id})[0],days=r&&r[5],c=0,tot=0,d,n=dim(i);for(d=0;d<n;d++){if(days&&days.length&&days.indexOf(new Date(YEAR,i,d+1).getDay())<0)continue;tot++;if(m.routines[id][d])c++}tot=tot||1;return{done:c,total:tot,pct:c/tot}}
+function libFind(id){var i;for(i=0;i<LIBRARY.length;i++)if(LIBRARY[i][0]===id)return LIBRARY[i];return null}
+function idsToRoutines(ids){var out=[],i,r;for(i=0;i<ids.length;i++){r=libFind(ids[i]);if(r)out.push([r[0],r[1],r[2],r[3]])}return out}
+function slugify(s){return(String(s).toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"").slice(0,20)||"routine")}
+function suggestIds(dayType,cats){var pool=LIBRARY.filter(function(r){return cats.indexOf(r[4])>=0});if(pool.length<10){var extra=LIBRARY.filter(function(r){return pool.indexOf(r)<0&&["hydration","meals","sleep"].indexOf(r[4])>=0});pool=pool.concat(extra)}
+var seen={},uniq=[];pool.forEach(function(r){if(!seen[r[0]]){seen[r[0]]=true;uniq.push(r)}});pool=uniq;
+var pref=(DAYTYPES.filter(function(d){return d[0]===dayType})[0]||[])[2];
+pool.sort(function(a,b){var av=a[4]===pref?0:1,bv=b[4]===pref?0:1;return av-bv});
+var cap={m:5,s:5,e:5},ct={m:0,s:0,e:0},out=[],i,r;
+for(i=0;i<pool.length&&out.length<16;i++){r=pool[i];if(ct[r[2]]<cap[r[2]]){out.push(r);ct[r[2]]++}}
+if(out.length<10)for(i=0;i<pool.length&&out.length<10;i++){if(out.indexOf(pool[i])<0)out.push(pool[i])}
+return out.map(function(r){return r[0]})}
+/* art */
+var RI={
+sun:'<circle cx="12" cy="12" r="4.6"/><path d="M12 2.8v2.2M12 19v2.2M2.8 12H5M19 12h2.2M5.5 5.5l1.6 1.6M16.9 16.9l1.6 1.6M18.5 5.5l-1.6 1.6M7.1 16.9l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
+alarm:'<path fill-rule="evenodd" d="M12 5a8 8 0 1 0 0 16 8 8 0 0 0 0-16zM11 9.2a1 1 0 0 1 2 0v3.3l2.1 1.3a1 1 0 0 1-1 1.7l-2.6-1.6a1 1 0 0 1-.5-.9z"/><circle cx="5.2" cy="5.6" r="2.6"/><circle cx="18.8" cy="5.6" r="2.6"/>',
+water:'<path d="M12 2.6c3.6 4.1 6.6 7.3 6.6 11.1a6.6 6.6 0 0 1-13.2 0c0-3.8 3-7 6.6-11.1z"/>',
+cup:'<path d="M4 10h12v4.5A5.500 5.500 0 0 1 10.500 20h-1A5.500 5.500 0 0 1 4 14.500z"/><path d="M16 11.500h1.300a2.700 2.700 0 0 1 0 5.400H15.500M7.500 3.500v3M11 3.500v3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+bowl:'<path d="M2.500 10.500h19a9.500 9.500 0 0 1-9.500 9.500 9.500 9.500 0 0 1-9.500-9.500z"/><path d="M8 3.500v3.500M12 2.800v4.200M16 3.500v3.500" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+apple:'<path d="M12 7.500c-1.800-1.600-6.800-1.700-7.800 3.300-.9 4.700 1.700 10 5 10 1 0 1.700-.6 2.800-.6s1.800.6 2.800.6c3.300 0 5.900-5.300 5-10-1-5-6-4.900-7.800-3.300z"/><path d="M12 7.500c0-2 1-3.700 3-4.500" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+bag:'<path fill-rule="evenodd" d="M9.500 3h5A2.500 2.500 0 0 1 17 5.500v.6A5.500 5.500 0 0 1 20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a5.500 5.500 0 0 1 3-4.900v-.6A2.500 2.500 0 0 1 9.500 3zM8.500 13.500a1 1 0 0 0-1 1V17a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-2.500a1 1 0 0 0-1-1z"/>',
+book:'<path fill-rule="evenodd" d="M7.500 2.500h10A3 3 0 0 1 20.500 5.500V16.500H7A2 2 0 0 0 5 18.500V5A2.500 2.500 0 0 1 7.500 2.500zM9.500 6.500a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2z"/><path d="M5 19.500A2 2 0 0 1 7 17.500h13.500v2A2 2 0 0 1 18.500 21.500H7A2 2 0 0 1 5 19.500z"/>',
+pencil:'<path d="M15.300 3.700a2.400 2.400 0 0 1 3.400 0l1.600 1.600a2.400 2.400 0 0 1 0 3.400L9.800 19.200 3.500 20.500l1.300-6.300z"/>',
+music:'<circle cx="7.500" cy="17.500" r="3.500"/><circle cx="17" cy="14.500" r="3.500"/><path d="M11 17.500V5.500l9-2v11" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/>',
+dumbbell:'<rect x="2" y="9" width="3.200" height="6" rx="1.400"/><rect x="4.800" y="5.500" width="4" height="13" rx="1.800"/><rect x="15.200" y="5.500" width="4" height="13" rx="1.800"/><rect x="18.800" y="9" width="3.200" height="6" rx="1.400"/><rect x="8" y="10.800" width="8" height="2.400"/>',
+flower:'<circle cx="12" cy="6.600" r="3.800"/><circle cx="17.100" cy="10.300" r="3.800"/><circle cx="15.200" cy="16.300" r="3.800"/><circle cx="8.800" cy="16.300" r="3.800"/><circle cx="6.900" cy="10.300" r="3.800"/><circle cx="12" cy="12" r="3.500"/>',
+bed:'<rect x="2" y="11.500" width="20" height="5" rx="1.800"/><rect x="2" y="5" width="2.800" height="14.500" rx="1.400"/><rect x="19.200" y="15" width="2.800" height="4.500" rx="1.400"/><rect x="6.500" y="7.500" width="5.500" height="3.200" rx="1.600"/><rect x="13" y="7.500" width="7" height="3.200" rx="1.600"/>',
+moon:'<path d="M20.500 14.500A8.500 8.500 0 0 1 9.500 3.500a8.500 8.500 0 1 0 11 11z" stroke="currentColor" stroke-width="1.600" stroke-linejoin="round"/>',
+star:'<path d="M12 2.800l2.700 5.800 6.300.8-4.600 4.400 1.200 6.300L12 17l-5.600 3.100 1.200-6.300L3 9.400l6.300-.8z" stroke="currentColor" stroke-width="1.800" stroke-linejoin="round"/>',
+bolt:'<path d="M13.500 2.800L5 13.500h5.500L9.500 21.200 19 10h-5.500z" stroke="currentColor" stroke-width="1.800" stroke-linejoin="round"/>',
+smile:'<path fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8.500 9a1.200 1.200 0 0 1 2.400 0v1.300a1.200 1.200 0 0 1-2.400 0zM13.100 9a1.200 1.200 0 0 1 2.400 0v1.300a1.200 1.200 0 0 1-2.400 0zM7.700 14.300a1 1 0 0 1 1.400-.1c1.800 1.400 4 1.400 5.800 0a1 1 0 1 1 1.200 1.600c-2.500 1.900-5.700 1.900-8.200 0a1 1 0 0 1-.2-1.500z"/>',
+pill:'<g transform="rotate(-45 12 12)"><path d="M7 11.500V8a4.500 4.500 0 0 1 4.500-4.500h1A4.500 4.500 0 0 1 17 8v3.500z"/><path opacity=".55" d="M7 13v3a4.500 4.500 0 0 0 4.500 4.500h1A4.500 4.500 0 0 0 17 16v-3z"/></g>',
+clip:'<path fill-rule="evenodd" d="M6 3.500h12a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-11a3 3 0 0 1 3-3zM6.800 9a1 1 0 0 0 0 2h.4a1 1 0 0 0 0-2zM10.500 9a1 1 0 0 0 0 2h6.700a1 1 0 0 0 0-2zM6.800 14a1 1 0 0 0 0 2h.4a1 1 0 0 0 0-2zM10.500 14a1 1 0 0 0 0 2h6.700a1 1 0 0 0 0-2z"/>',
+laptop:'<path d="M5 4h14a2.500 2.500 0 0 1 2.500 2.500V15a2.500 2.500 0 0 1-2.500 2.500H5A2.500 2.500 0 0 1 2.500 15V6.500A2.500 2.500 0 0 1 5 4z"/><path d="M2 19.300h20a1.500 1.500 0 0 1-1.500 1.700h-17A1.500 1.500 0 0 1 2 19.300z"/>',
+chat:'<path fill-rule="evenodd" d="M6 3h12a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4h-5.500L7.500 21v-4H6a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zM8 9.200a1.200 1.200 0 1 0 0 2.400 1.200 1.200 0 0 0 0-2.400zM12 9.200a1.200 1.200 0 1 0 0 2.400 1.200 1.200 0 0 0 0-2.400zM16 9.200a1.200 1.200 0 1 0 0 2.400 1.200 1.200 0 0 0 0-2.400z"/>',
+phone:'<path fill-rule="evenodd" d="M8 2h8a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3zM10 17.500a1 1 0 0 0 0 2h4a1 1 0 0 0 0-2z"/>',
+sparkle:'<path d="M11 2.500c.7 4.900 2.600 6.800 7.500 7.500-4.900.7-6.800 2.600-7.500 7.500-.7-4.900-2.600-6.800-7.500-7.500 4.900-.7 6.800-2.600 7.500-7.500z" stroke="currentColor" stroke-width="1.600" stroke-linejoin="round"/><circle cx="19" cy="18.500" r="2.200"/><circle cx="19.500" cy="4.500" r="1.600"/>',
+house:'<path d="M12 3l9.500 8.300a1 1 0 0 1-.7 1.700H19v6.500a1.500 1.500 0 0 1-1.500 1.500H14v-5h-4v5H6.500A1.500 1.500 0 0 1 5 19.500V13H3.200a1 1 0 0 1-.7-1.700z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>',
+leaf:'<path d="M20 4C10.500 4 4 9 4 15.500A4.500 4.500 0 0 0 8.500 20C15 20 20 13.500 20 4z"/>',
+heart:'<path d="M12 20.500s-8.500-4.900-8.500-11A4.800 4.800 0 0 1 12 6.800a4.800 4.800 0 0 1 8.500 2.700c0 6.100-8.500 11-8.500 11z" stroke="currentColor" stroke-width="1.400" stroke-linejoin="round"/>',
+roll:'<path fill-rule="evenodd" d="M7.500 4h9A3.500 3.500 0 0 1 20 7.500v9a3.500 3.500 0 0 1-3.500 3.500h-9A3.500 3.500 0 0 1 4 16.500v-9A3.500 3.500 0 0 1 7.500 4zM14.500 9.500a2.500 2.500 0 1 0 0 5 2.500 2.500 0 0 0 0-5z"/>',
+briefcase:'<path fill-rule="evenodd" d="M9.500 3.500h5A1.500 1.500 0 0 1 16 5v1.500h3.500A2.500 2.500 0 0 1 22 9v9a2.500 2.500 0 0 1-2.500 2.500h-15A2.500 2.500 0 0 1 2 18V9a2.500 2.500 0 0 1 2.500-2.500H8V5a1.500 1.500 0 0 1 1.500-1.500zM10 5.500v1h4v-1z"/>',
+trash:'<path d="M5.500 8h13l-.9 11.500A2.500 2.500 0 0 1 15.100 22H8.900a2.500 2.500 0 0 1-2.500-2.500z"/><rect x="3" y="4.500" width="18" height="2.400" rx="1.200"/><path d="M9.500 4.500V4A1.500 1.500 0 0 1 11 2.500h2A1.500 1.500 0 0 1 14.500 4v.5z"/>'
+},RIL=["sun","alarm","water","cup","bowl","apple","bag","book","pencil","music","dumbbell","flower","bed","moon","star","bolt","smile","pill","clip","laptop","chat","phone","sparkle","house","leaf","heart","roll","briefcase"];
+function ico(n,s){s=s||18;if(RI[n])return'<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">'+RI[n]+"</svg>";var p={home:"M12 3l9 8h-3v9h-4v-6h-4v6H6v-9H3z",cal:"M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2zm-2 6h18",list:"M4 6h3v3H4zm5 1h11v2H9zM4 11h3v3H4zm5 1h11v2H9zM4 16h3v3H4zm5 1h11v2H9z",chart:"M4 20V10h4v10zm6 0V4h4v16zm6 0v-7h4v7z",gear:"M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm-1-6h2l.5 3 2 1 2.5-1.7 1.4 1.4L19.7 8.3l1 2 3 .5v2l-3 .5-1 2 1.7 2.5-1.4 1.4-2.5-1.7-2 1-.5 3h-2l-.5-3-2-1-2.5 1.7-1.4-1.4L6.3 15.7l-1-2-3-.5v-2l3-.5 1-2L4.6 6.2 6 4.8l2.5 1.7 2-1z",check:"M5 12.5l4.5 4.5L19 7.5",flame:"M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-4 2-6 2 1 3 2 3 3 1-3 1-6 1-9z",water:"M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.500 6-11 6-11z",moon:"M20 14A8 8 0 0 1 10 4a8 8 0 1 0 10 10z",star:"M12 2l2.9 6.3 6.6.7-5 4.5 1.500 6.500L12 16.700 6 20l1.500-6.500-5-4.500 6.600-.7z",bolt:"M13 2L4 14h6l-1 8 9-12h-6z",alarm:"M12 5a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 3v5l3 2M4 5l3-2m13 2l-3-2",dot:"M12 5a7 7 0 1 0 0 14 7 7 0 0 0 0-14z",paw:"M12 12c3 0 5 3 5 5s-2 3-5 3-5-1-5-3 2-5 5-5zM6 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM9.500 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm5 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z",arrow:"M7 17L17 7M9 7h8v8",sliders:"M3 6h9a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2zM15 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM12 11h9a1 1 0 1 1 0 2h-9a1 1 0 1 1 0-2zM9 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM3 17h6a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2zM17 15a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"};var st=(n==="check"||n==="cal"||n==="alarm"||n==="arrow");return'<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="'+(st?"none":"currentColor")+'" stroke="'+(st?"currentColor":"none")+'" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"><path d="'+(p[n]||p.dot)+'"/></svg>'}
+function bunny(o){o=o||{};var t=o.tint||"#F3A9C4",s=o.size||120,e=o.expr||"glossy",I="#1B1B22",F="#EEEAF8",eyes;
+if(e==="happy"||e==="squint")eyes='<path d="M36 68q8-11 16 0M68 68q8-11 16 0" fill="none" stroke="'+I+'" stroke-width="3.500" stroke-linecap="round"/>';
+else if(e==="love")eyes='<path d="M44 76l-7-8a4 4 0 0 1 7-4 4 4 0 0 1 7 4zM76 76l-7-8a4 4 0 0 1 7-4 4 4 0 0 1 7 4z" fill="#FF7057"/>';
+else eyes='<g class="blink"><ellipse cx="44" cy="68" rx="7" ry="9" fill="'+I+'"/><ellipse cx="76" cy="68" rx="7" ry="9" fill="'+I+'"/><circle cx="46" cy="64" r="2.500" fill="#fff"/><circle cx="78" cy="64" r="2.500" fill="#fff"/></g>';
+var paw=(o.pose==="wave"||o.pose==="cheer")?'<ellipse cx="104" cy="96" rx="9" ry="13" fill="'+F+'" stroke="'+I+'" stroke-width="3"/>':"";
+return'<svg class="bun" width="'+s+'" height="'+Math.round(s*1.167)+'" viewBox="0 0 120 140"><g stroke="'+I+'" stroke-width="3" stroke-linejoin="round"><ellipse cx="42" cy="34" rx="12" ry="30" fill="'+F+'"/><ellipse cx="78" cy="34" rx="12" ry="30" fill="'+F+'"/><ellipse cx="42" cy="36" rx="5" ry="20" fill="'+t+'" stroke="none"/><ellipse cx="78" cy="36" rx="5" ry="20" fill="'+t+'" stroke="none"/><ellipse cx="60" cy="88" rx="44" ry="38" fill="'+F+'"/>'+paw+'</g><ellipse cx="28" cy="90" rx="9" ry="6" fill="'+t+'" opacity=".55"/><ellipse cx="92" cy="90" rx="9" ry="6" fill="'+t+'" opacity=".55"/>'+eyes+'<ellipse cx="60" cy="82" rx="4" ry="3" fill="#E58AA5"/><path d="M52 92q8 8 16 0" fill="none" stroke="'+I+'" stroke-width="3" stroke-linecap="round"/></svg>'}
+function avatar(id){var t=TINTS.filter(function(x){return x[0]===id})[0];return t?bunny({tint:t[1],size:38,expr:"happy"}):'<b style="font:800 18px var(--df)">'+esc((state.profile.displayName||"B").charAt(0).toUpperCase())+'</b>'}
+function mood(i,s){s=s||52;var m=MO[i],b=i===4?'<path d="M-13-10l8 3M13-10l-8 3" stroke="#111" stroke-width="2.500" stroke-linecap="round"/>':"",x=i===2?'<path d="M-13 3q-2 6 0 8q2-2 0-8z" fill="#4A90D9" transform="translate(3 0)"/>':"",y=i===5?'<g fill="#5B4FC0"><circle cx="-8" cy="22" r="1.800"/><circle cx="0" cy="24" r="1.800"/><circle cx="8" cy="22" r="1.800"/></g>':"",z=i===1?'<path d="M0-16l1.500 3 3 1.500-3 1.500L0-7l-1.500-3-3-1.500 3-1.500z" fill="#fff"/>':"";
+return'<svg width="'+s+'" height="'+s+'" viewBox="-24 -24 48 48"><path d="M0-19c12 0 19 7 19 17S12 19 0 19-19 8-19-2 -12-19 0-19z" fill="'+m[1]+'"/><ellipse cx="-11" cy="5" rx="4" ry="3" fill="#fff" opacity=".2"/><ellipse cx="11" cy="5" rx="4" ry="3" fill="#fff" opacity=".2"/>'+b+'<circle cx="-7" cy="-3" r="2.300" fill="#111"/><circle cx="7" cy="-3" r="2.300" fill="#111"/><path d="'+MOUTH[i]+'" fill="none" stroke="#111" stroke-width="2.300" stroke-linecap="round" transform="translate(0 1)"/>'+x+y+z+'</svg>'}
+/* ui helpers */
+var tt;function toast(m){var e=document.getElementById("toast");e.textContent=m;e.className="show";clearTimeout(tt);tt=setTimeout(function(){e.className=""},2400)}
+function confirmBox(t,x,fn,lbl){var e=document.getElementById("modal");e.innerHTML='<div class="box"><b style="font:800 17px var(--df)">'+t+'</b><p style="color:var(--ink-soft);margin-top:6px">'+x+'</p><div class="row"><button class="btn ghost" data-action="m-no">Cancel</button><button class="btn dng" data-action="m-yes">'+(lbl||"Confirm")+'</button></div></div>';e.className="show";e.onclick=function(ev){var a=ev.target.getAttribute("data-action");if(ev.target===e||a==="m-no"){e.className=""}else if(a==="m-yes"){e.className="";fn()}}}
+function pills(){var h='<div class="capsule"><div class="scroll">';MN.forEach(function(n,i){h+='<button class="mp'+(i===state.m?" sel":"")+'" data-action="select-month" data-i="'+i+'">'+n+'</button>'});return h+"</div></div>"}
+function checks(m,list,key){var h="";list.forEach(function(x){var on=m[key][x[0]];h+='<button class="sq'+(on?" done":"")+'" role="checkbox" aria-checked="'+on+'" data-action="toggle-'+(key==="tasks"?"task":"sc")+'" data-k="'+x[0]+'"><i>'+(on?ico("check",14):"")+'</i>'+x[1]+'</button>'});return h}
+function moodGrid(m){var h='<div class="moods">';MO.forEach(function(x,i){h+='<button class="mood'+(m.mood[state.d-1]===i?" sel":"")+(state.moodPop===i?" popm":"")+'" data-action="select-mood" data-i="'+i+'" aria-pressed="'+(m.mood[state.d-1]===i)+'">'+mood(i)+x[0]+'</button>'});state.moodPop=null;return h+"</div>"}
+function gratitude(m){var h="";m.grateful.forEach(function(g,i){h+='<input class="gi" data-g="'+i+'" maxlength="80" placeholder="'+(i+1)+'. something good" value="'+esc(g)+'">'});return h}
+function buddyLine(c){var h=NOW.getHours(),n=state.profile.buddyName||"Your bunny",t,e="glossy";if(c===0){t=h<12?"Good morning! Ready to tick a few?":h<18?"Still time to get some ticks in.":"One small tick before bed?"}else if(c<=.34){t="Nice start, keep hopping!";e="happy"}else if(c<=.67){t="Halfway there. Love it!";e="love"}else if(c<1){t="Almost perfect, just a few left!";e="love"}else{t="Perfect day! I'm so proud of you.";e="happy"}
+var t2=TINTS.filter(function(x){return x[0]===state.profile.avatarId})[0];return'<div class="row" style="margin:14px 0"><div data-action="wiggle">'+bunny({tint:t2?t2[1]:"#F3A9C4",size:52,expr:e,pose:c===1?"cheer":""})+'</div><div class="card" style="margin:0;background:#fff;border-radius:22px;padding:12px 14px"><b>'+esc(n)+':</b> '+t+'</div></div>'}
+var rf={period:"m",icon:"dot",days:[]};
+var DOWL=["Su","Mo","Tu","We","Th","Fr","Sa"];
+function routineFormHTML(){var segs="",icons="",dows="";["m","s","e"].forEach(function(k){segs+='<button class="'+(rf.period===k?"sel":"")+'" data-p="'+k+'" data-action="rf-period">'+GN[k]+"</button>"});RIL.forEach(function(ic){icons+='<button class="'+(rf.icon===ic?"sel":"")+'" data-ic="'+ic+'" data-action="rf-icon" aria-label="'+ic+'">'+ico(ic,22)+"</button>"});DOWL.forEach(function(lb,i){dows+='<button class="'+(rf.days.indexOf(i)>=0?"sel":"")+'" data-day="'+i+'" data-action="rf-day">'+lb+"</button>"});
+return'<div class="box"><b style="font:800 17px var(--df)">'+(rf.id?"Edit routine":"Add a routine")+'</b><input class="inp" id="rfLabel" maxlength="40" placeholder="e.g. read before bed" value="'+esc(rf.label||"")+'" style="margin-top:12px"><div class="lbl" style="margin:14px 4px 6px">time of day</div><div class="seg">'+segs+'</div><div class="lbl" style="margin:14px 4px 6px">repeat on <small style="text-transform:none;font-weight:600;letter-spacing:0">(leave all off for every day)</small></div><div class="dowrow">'+dows+'</div><div class="lbl" style="margin:14px 4px 6px">icon</div><div class="ipick">'+icons+'</div><div class="row" style="margin-top:16px"><button class="btn ghost" data-action="rf-cancel">Cancel</button><button class="btn lime" data-action="rf-save">'+(rf.id?"Save":"Add")+'</button></div></div>'}
+function openRoutineForm(ctx,defPeriod,editId){var er=editId&&(state.profile.routines||[]).filter(function(x){return x[0]===editId})[0];rf=er?{period:er[2],icon:er[3],id:editId,label:er[1],days:er[5]?er[5].slice():[]}:{period:defPeriod||"m",icon:"sparkle",days:[]};var e=document.getElementById("modal");e.innerHTML=routineFormHTML();e.className="show";
+e.onclick=function(ev){if(ev.target===e){e.className="";return}
+var t=ev.target,a;while(t&&t!==e&&!(a=t.getAttribute&&t.getAttribute("data-action")))t=t.parentNode;if(!a)return;
+if(a==="rf-cancel"){e.className="";return}
+if(a==="rf-period"){rf.period=t.getAttribute("data-p");var bs=e.querySelectorAll(".seg button"),i;for(i=0;i<bs.length;i++)bs[i].className=bs[i].getAttribute("data-p")===rf.period?"sel":"";return}
+if(a==="rf-icon"){rf.icon=t.getAttribute("data-ic");var ic2=e.querySelectorAll(".ipick button"),j;for(j=0;j<ic2.length;j++)ic2[j].className=ic2[j].getAttribute("data-ic")===rf.icon?"sel":"";return}
+if(a==="rf-day"){var dv=+t.getAttribute("data-day"),ix=rf.days.indexOf(dv);if(ix>=0)rf.days.splice(ix,1);else rf.days.push(dv);var db2=e.querySelectorAll(".dowrow button"),z;for(z=0;z<db2.length;z++)db2[z].className=rf.days.indexOf(+db2[z].getAttribute("data-day"))>=0?"sel":"";return}
+if(a==="rf-save"){var lbl=document.getElementById("rfLabel").value.replace(/[<>]/g,"").trim();if(!lbl)return;var daysOut=rf.days&&rf.days.length?rf.days.slice().sort():null;if(rf.id){var ps=state.profile.routines||[],q;for(q=0;q<ps.length;q++)if(ps[q][0]===rf.id){ps[q][1]=lbl;ps[q][2]=rf.period;if(ps[q][3]!==rf.icon){ps[q][3]=rf.icon;ps[q][4]=1}ps[q][5]=daysOut}saveProfile();e.className="";render();return}var id=slugify(lbl)+"_"+Math.random().toString(36).slice(2,6),newR=[id,lbl,rf.period,rf.icon,0,daysOut];
+if(ctx==="onboarding"){state.onb.custom.push(newR);e.className="";renderOnb(true)}
+else{state.profile.routines=state.profile.routines||[];state.profile.routines.push(newR);gm(state.m);saveProfile();save();e.className="";render()}}}}
+/* views */
+function vHome(){var routines=state.profile.routines||[],m=gm(RM),ac=activeCount(YEAR,RM,RD),c=dayDone(m,RD)/ac,mc=monthTotal(m,RM)/monthExpected(RM),st=streak(m,RD),md=m.mood[RD-1],h=buddyLine(c);
+h+='<div class="card big blk halo" style="margin-top:14px"><div class="row sp"><b style="font:800 20px var(--df)">Daily Goal</b><span class="pill lime">'+MF[RM]+' - day '+RD+' of '+dim(RM)+'</span></div><div class="row" style="margin:16px 0"><div class="ring" style="--ang:'+Math.round(mc*360)+'deg;background:conic-gradient(var(--accent) var(--ang),rgba(255,255,255,.18) 0)"><div><span>'+pct(mc)+'%<small>this month</small></span></div></div><div style="flex:1"><div class="stat"><span>today\'s routines</span><b>'+dayDone(m,RD)+' / '+ac+'</b></div><div class="stat"><span>streak</span><b style="color:#F3F7E6">'+ico("flame",13)+' '+st+' day'+(st===1?"":"s")+'</b></div><div class="stat"><span>today\'s mood</span><b>'+(md===null||md===undefined?"\u2014":MO[md][0])+'</b></div></div></div><button class="btn lime" data-action="go" data-v="planner">Open today\'s planner</button></div>';
+h+='<div class="tiles"><button class="tile l notch" data-action="go" data-v="planner"><span class="chip">'+ico("arrow",18)+'</span><b style="margin-top:44px">Open planner</b>tick today\'s list</button><button class="tile k" data-action="go" data-v="routines"><span style="color:var(--accent)">'+ico("paw",26)+'</span><b style="margin-top:34px">View routines</b>see all habits</button></div>';
+h+='<div class="card"><div class="row sp"><b style="font:800 17px var(--df)">Routine board</b><span style="font-size:11.500px">\u25CF Done \u25CB Left</span></div>';
+["m","s","e"].forEach(function(k){var t=routines.filter(function(r){return r[2]===k&&routineOnDay(r,YEAR,RM,RD)}),d=t.filter(function(r){return m.routines[r[0]]&&m.routines[r[0]][RD-1]}).length;h+='<div class="row" style="margin-top:10px"><span style="width:70px;font-weight:700">'+GN[k]+'</span><div class="bar"><i style="width:'+pct(t.length?d/t.length:0)+'%"></i></div><span class="pill">'+d+'/'+t.length+'</span></div>'});
+h+="</div><div class=\"lbl\">"+MF[RM]+"'s tasks - "+TK.filter(function(t){return m.tasks[t[0]]}).length+"/4</div><div class=\"card\">"+checks(m,TK,"tasks")+'</div><div class="lbl">grateful for this month</div><div class="card">'+gratitude(m)+"</div>";return h}
+function vPlanner(){var routines=state.profile.routines||[],m=gm(state.m),n=dim(state.m);if(state.d>n)state.d=n;var acd=activeCount(YEAR,state.m,state.d),h="<h1>Planner</h1>"+pills()+'<div class="capsule" style="margin:12px 0"><div class="scroll" id="ds">';
+for(var d=1;d<=n;d++){var dd=dayDone(m,d);h+='<button class="dc'+(dd?" dot":"")+(dd===activeCount(YEAR,state.m,d)?" full":"")+(d===state.d?" sel":"")+(state.m===RM&&d===RD?" today":"")+'" data-action="select-day" data-d="'+d+'">'+d+"</button>"}
+h+='</div></div><div class="row sp" style="margin-bottom:8px"><b style="font:800 18px var(--df)">Day '+state.d+" - "+new Date(YEAR,state.m,state.d).toLocaleDateString(undefined,{weekday:"long"})+'</b><span class="pill">'+dayDone(m,state.d)+'/'+acd+' done</span></div>'+moodGrid(m)+'<div class="row sp" style="margin:14px 0 4px"><b style="font:800 18px var(--df)">Routines</b><button class="pill" data-action="toggle-edit-r">'+(state.editR?"Done":"Edit")+'</button></div>';
+["m","s","e"].forEach(function(k){var all=routines.filter(function(r){return r[2]===k}),t=state.editR?all:all.filter(function(r){return routineOnDay(r,YEAR,state.m,state.d)}),d=t.filter(function(r){return m.routines[r[0]]&&m.routines[r[0]][state.d-1]}).length;h+='<div class="grp"><span class="pill">'+GN[k]+" "+d+"/"+t.length+"</span></div>";t.forEach(function(r){if(state.editR){h+='<div class="rc"><span class="ic">'+ico(r[3])+"</span>"+r[1]+(r[5]&&r[5].length?'<span class="pill" style="margin-left:auto;font-size:10px">'+r[5].map(function(x){return DOWL[x]}).join(" ")+'</span>':"")+'<span class="rx"><button data-action="edit-routine" data-r="'+r[0]+'" aria-label="Edit routine">'+ico("pencil",17)+'</button><button class="dg" data-action="remove-routine" data-r="'+r[0]+'" aria-label="Delete routine">'+ico("trash",17)+"</button></span></div>";return}var on=m.routines[r[0]][state.d-1];h+='<button class="rc'+(on?" done":"")+(state.pop===r[0]+"-"+state.d?" pop":"")+'" role="checkbox" aria-checked="'+on+'" data-action="toggle-routine" data-r="'+r[0]+'" data-d="'+state.d+'"><span class="ic">'+ico(r[3])+"</span>"+r[1]+'<span class="ck">'+ico("check",16)+"</span></button>"});h+='<button class="rc" style="background:transparent;border:1.5px dashed var(--ink-soft);color:var(--ink-soft);justify-content:center" data-action="add-routine" data-p="'+k+'">+ Add routine</button>'});
+state.pop=null;return h+'<div class="lbl">monthly self care</div><div class="card">'+checks(m,SC,"selfcare")+'</div><div class="lbl">monthly tasks - '+TK.filter(function(t){return m.tasks[t[0]]}).length+'/4</div><div class="card">'+checks(m,TK,"tasks")+'</div><div class="lbl">grateful for this month</div><div class="card">'+gratitude(m)+"</div>"}
+function vRoutines(){var routines=state.profile.routines||[],m=gm(state.m),n=dim(state.m),all=monthTotal(m,state.m),h="<h1>Routines</h1>"+pills()+'<div class="card big blk row sp" style="margin-top:12px"><b style="font:800 20px var(--df)">Keep it up</b><span class="pill lime">'+fmt(all,monthExpected(state.m))+"</span></div>";
+["m","s","e"].forEach(function(k){h+='<div class="lbl">'+GN[k]+"</div>";routines.filter(function(r){return r[2]===k}).forEach(function(r){var s=rStats(m,r[0],state.m);h+='<div class="card halo" style="border:2px solid var(--accent)"><div class="row"><span class="av" style="width:34px;height:34px;border-radius:12px">'+ico(r[3])+'</span><b style="flex:1">'+r[1]+'</b><span class="pill">'+fmt(s.done,s.total)+'</span><button class="pill" style="background:transparent;color:var(--ink-soft);padding:4px 8px" data-action="edit-routine" data-r="'+r[0]+'" aria-label="Edit routine">'+ico("pencil",14)+'</button><button class="pill" style="background:transparent;color:var(--ink-soft);padding:4px 8px" data-action="remove-routine" data-r="'+r[0]+'" aria-label="Remove routine">\u2715</button></div><div class="bar" style="margin-top:10px;height:8px"><i style="width:'+pct(s.pct)+'%"></i></div><div class="dots">';for(var d=1;d<=n;d++)h+='<button class="dd'+(m.routines[r[0]][d-1]?" on":"")+(state.m===RM&&d===RD?" t":"")+'" aria-label="day '+d+'" data-action="toggle-routine" data-r="'+r[0]+'" data-d="'+d+'"></button>';h+="</div></div>"});h+='<button class="rc" style="background:transparent;border:1.5px dashed var(--ink-soft);color:var(--ink-soft);justify-content:center" data-action="add-routine" data-p="'+k+'">+ Add routine</button>'});return h}
+function vProgress(){var routines=state.profile.routines||[],m=gm(state.m),n=dim(state.m),tot=monthTotal(m,state.m),up=state.m===RM?RD:n,mx=monthExpected(state.m),h="<h1>Progress</h1>"+pills()+'<div class="tiles" style="margin-top:12px"><div class="tile l" style="flex:1.2"><b style="font:800 34px var(--df)">'+fmt(tot,mx)+'</b>month complete</div><div class="tile k"><b style="font:800 34px var(--df)">'+tot+'</b>of '+mx+' ticks</div><div class="tile o" style="flex:.8">'+ico("bolt",20)+'<b style="font:800 34px var(--df)">'+streak(m,up,state.m)+'</b>day streak</div></div><div class="card"><b>Daily completion</b><div class="cols" style="margin-top:10px">';
+for(var d=1;d<=n;d++)h+='<i class="'+(state.m===RM&&d===RD?"t":"")+'" style="height:'+Math.max(4,pct(dayDone(m,d)/activeCount(YEAR,state.m,d)))+'%"></i>';h+="</div></div>";
+var S=routines.map(function(r){var s=rStats(m,r[0],state.m);return{n:r[1],s:s}}).sort(function(a,b){return b.s.pct-a.s.pct});
+function stack(t,l,big){var k=big?"k":"l";var x='<div class="lbl">'+t+'</div><div style="position:relative;margin-bottom:12px;height:'+(96+2*36)+'px">';l.forEach(function(e,i){var bg=i===0?(big?"var(--black);color:var(--on-black)":"var(--accent)"):i===1?(big?"var(--accent);color:#111":"var(--black);color:var(--on-black)"):"var(--accent-dark);color:#fff";x+='<div style="position:absolute;left:0;right:0;top:'+(2-i)*36+'px;z-index:'+(3-i)+';background:'+bg+';border-radius:26px;padding:14px 18px;height:96px" class="row sp"><b>'+e.n+"</b><span style=\"font:800 "+(i===0?34:20)+'px var(--df)">'+fmt(e.s.done,e.s.total)+"</span></div>"});return x+"</div>"}
+h+=stack("Strongest routines",S.slice(0,3),false)+stack("Needs a little love",S.slice(-3).reverse(),true);
+h+='<div class="lbl">Mood this month</div><div class="card row" style="flex-wrap:wrap;justify-content:space-around">';MO.forEach(function(x,i){var c=0;for(var d=0;d<n;d++)if(m.mood[d]===i)c++;h+='<div style="text-align:center;font-size:11px;font-weight:800">'+mood(i,46)+"<br>"+c+" "+x[0]+"</div>"});
+h+='</div><div class="tiles"><div class="tile l"><b>self care</b>'+SC.filter(function(s){return m.selfcare[s[0]]}).length+'/4</div><div class="tile k"><b>tasks</b>'+TK.filter(function(s){return m.tasks[s[0]]}).length+"/4</div></div>";return h}
+function vSettings(){var p=state.profile,h="<h1>Settings</h1><div class=\"lbl\">profile</div><div class=\"card\"><label>display name</label><div class=\"row\"><input class=\"inp\" id=\"setName\" maxlength=\"40\" value=\""+esc(p.displayName)+"\"><button class=\"pill\" data-action=\"save-name\">Save</button></div><small style=\"color:var(--ink-soft)\">shown in your greeting</small><br><label>buddy name</label><div class=\"row\"><input class=\"inp\" id=\"setBuddy\" maxlength=\"16\" value=\""+esc(p.buddyName)+"\"><button class=\"pill\" data-action=\"save-buddy\">Save</button></div><label>bunny look</label><div class=\"scroll\">";
+TINTS.forEach(function(t){h+='<button class="dc'+(p.avatarId===t[0]?" sel":"")+'" data-action="set-avatar" data-id="'+t[0]+'" style="padding:2px" aria-label="'+t[0]+'">'+bunny({tint:t[1],size:36,expr:"happy"})+"</button>"});
+h+='</div></div><div class="lbl">welcome tour</div><div class="card row sp"><span>replay welcome screens</span><button class="pill" data-action="replay">Replay</button></div><div class="lbl">appearance</div><div class="card"><b>accent color</b> <small>'+THEMES.filter(function(t){return t[0]===state.theme})[0][1]+'</small><div class="scroll" style="margin-top:10px">';
+THEMES.forEach(function(t){h+='<button class="sw'+(t[0]===state.theme?" sel":"")+'" style="background:'+t[2]+'" data-action="select-theme" data-id="'+t[0]+'" aria-label="'+t[1]+'"></button>'});
+h+='</div><button class="btn ghost" style="margin-top:12px" data-action="select-theme" data-id="bunnygreen">Reset to Bunny Green</button></div>';
+h+='<div class="lbl">effects</div>';
+var FXDEFS=[["vibrancy","Vibrancy","Increase the saturation of the glass backdrop","slider",0,220],["blur","Blur Radius","Amount of blur on the glass surface","slider",0,40],["depth","Depth Effect","Lifts the glass with a deeper, richer shadow","toggle"]];
+FXDEFS.forEach(function(d){var key=d[0],val=state.fx[key];
+if(d[3]==="slider"){var lo=d[4],hi=d[5],pct=Math.round((val-lo)/(hi-lo)*100);
+h+='<div class="card fxrow"><div class="row" style="align-items:flex-start"><span class="fic">'+ico("sliders",18)+'</span><div style="flex:1"><b>'+d[1]+'</b><p>'+d[2]+'</p><input type="range" class="rng" min="'+lo+'" max="'+hi+'" step="1" value="'+val+'" style="--val:'+pct+'%" data-action="fx-slide" data-k="'+key+'" aria-label="'+d[1]+'"></div></div></div>'
+}else{
+h+='<div class="card fxrow row sp"><div class="row"><span class="fic">'+ico("sliders",18)+'</span><div><b>'+d[1]+'</b><p>'+d[2]+'</p></div></div><button class="toggle'+(val?" on":"")+'" data-action="fx-toggle" data-k="'+key+'" role="switch" aria-checked="'+!!val+'" aria-label="'+d[1]+'"><i>'+(val?ico("check",13):"")+'</i></button></div>'
+}});
+h+='<div class="lbl">planner</div><div class="card"><b>progress display</b><div class="seg"><button class="'+(state.fmt==="percent"?"sel":"")+'" data-action="set-format" data-f="percent">Percent</button><button class="'+(state.fmt==="fraction"?"sel":"")+'" data-action="set-format" data-f="fraction">Fraction</button></div></div>';
+h+='<div class="lbl">reminders</div><div class="card row sp"><span>check-in nudges<br><small style="color:var(--ink-soft);font-weight:600">every few hours + one before bed</small></span><button class="pill" data-action="toggle-reminders" role="switch" aria-checked="'+!!p.remindersOn+'">'+(p.remindersOn?"on":"off")+'</button></div>';
+h+='<div class="lbl">data</div><div class="card"><button class="btn" data-action="export">Export planner data (.json)</button></div><div class="lbl">reset progress</div><div class="card"><button class="btn dng" data-action="reset-month" style="margin-bottom:8px">Reset '+MF[state.m]+'</button><button class="btn dng" data-action="reset-all">Reset all months</button></div>';
+return h+'<div class="card"><b>Bunny\'s Planner 2.0.0</b><p style="color:var(--ink-soft)">Planner data stays on this device. '+rlen()+' daily habit'+(rlen()===1?"":"s")+', grouped by time of day. Focus and structure answers can be changed by replaying the tour.</p></div><p style="text-align:center;font-weight:700;margin-top:14px">'+ico("paw",14)+' made with love, by her owner</p>'}
+var VIEWS={home:vHome,planner:vPlanner,routines:vRoutines,progress:vProgress,settings:vSettings,partner:vPartner},SUB={home:"your daily routine tracker",planner:"track today, day by day",routines:"all your routines at a glance",progress:"see how far you've hopped",settings:"tune your planner",partner:"cheer each other on"},TABS=[["home","Home","home"],["planner","Planner","cal"],["routines","Routines","list"],["progress","Progress","chart"],["settings","Settings","gear"],["partner","Partner","heart"]];
+var NR=/\d+(?:\.\d+)?/g;
+function cnt(n,to){var from=n.nodeValue,fa=from.match(NR),ta=to.match(NR);if(n._cf)cancelAnimationFrame(n._cf);if(!fa||!ta||fa.length!==ta.length||from.replace(NR,"#")!==to.replace(NR,"#")){n.nodeValue=to;return}var parts=to.split(NR),t0=performance.now(),D=550;(function step(t){var k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3),o="",i,f,g,dec;for(i=0;i<ta.length;i++){f=parseFloat(fa[i]);g=parseFloat(ta[i]);dec=(ta[i].split(".")[1]||"").length;o+=parts[i]+(k<1?(f+(g-f)*e).toFixed(dec):ta[i])}o+=parts[i];n.nodeValue=o;if(k<1)n._cf=requestAnimationFrame(step)})(t0)}
+function mChildren(a,b){var x=a.firstChild,y=b.firstChild,nx,ny;while(y){ny=y.nextSibling;if(!x){a.appendChild(y)}else{nx=x.nextSibling;if(x.nodeType===y.nodeType&&x.nodeName===y.nodeName){mNode(x,y)}else{a.replaceChild(y,x)}x=nx}y=ny}while(x){nx=x.nextSibling;a.removeChild(x);x=nx}}
+function mNode(a,b){if(a.nodeType!==1){if(a.nodeValue!==b.nodeValue){if(a.nodeType===3&&a.parentNode&&a.parentNode.closest&&!a.parentNode.closest("button"))cnt(a,b.nodeValue);else a.nodeValue=b.nodeValue}return}var i,at,foc=a===document.activeElement;for(i=a.attributes.length-1;i>=0;i--){at=a.attributes[i].name;if(!b.hasAttribute(at))a.removeAttribute(at)}for(i=0;i<b.attributes.length;i++){at=b.attributes[i];if(a.getAttribute(at.name)!==at.value&&!(foc&&at.name==="value"))a.setAttribute(at.name,at.value)}if(a.nodeName==="INPUT"||a.nodeName==="TEXTAREA"){if(!foc&&a.value!==b.value)a.value=b.value;return}mChildren(a,b)}
+function morph(el,html){var t=document.createElement("template");t.innerHTML=html;mChildren(el,t.content)}
+var navTok=0;
+function render(){document.body.classList.toggle("onboarding-active",!!onbActive());onbEl.className=onbActive()?"show":"";if(onbActive()){renderOnb();return}
+var top='<div class="top"><span class="av">'+avatar(state.profile.avatarId)+'</span><div><b>Bunny\'s Planner</b><small>'+SUB[state.view]+'</small></div><button class="gear" aria-label="Settings" data-action="go" data-v="settings">'+ico("gear",20)+"</button></div>";
+var html=top+VIEWS[state.view]();if(state.last!==state.view){main.innerHTML=html;main.classList.remove("enter");void main.offsetWidth;main.classList.add("enter");state.last=state.view;var tk2=++navTok;setTimeout(function(){if(tk2===navTok)main.classList.remove("enter")},900);animateRings()}else morph(main,html);
+var i=0;TABS.forEach(function(t,j){if(t[0]===state.view)i=j});document.getElementById("ind").style.left="calc(4px + (100% - 8px)/6*"+i+")";var b=document.querySelectorAll("nav button");for(var j=0;j<b.length;j++)b[j].className=(j===i?"on":"")+(TABS[j][0]==="partner"&&P.unseen?" bd":"");
+var s=document.querySelector(".mp.sel");if(s&&s.parentNode)s.parentNode.scrollLeft=s.offsetLeft-100;var ds=document.getElementById("ds"),sd=ds&&ds.querySelector(".sel");if(sd)ds.scrollLeft=sd.offsetLeft-150}
+function animateRings(){var rings=main.querySelectorAll(".ring");for(var i=0;i<rings.length;i++){(function(r){var tgt=r.style.getPropertyValue("--ang");r.style.setProperty("--ang","0deg");void r.offsetWidth;requestAnimationFrame(function(){r.style.setProperty("--ang",tgt)})})(rings[i])}}
+/* onboarding */
+var STEPS=["welcome","buddyName","displayName","theme","goals","look","ready"],BG={welcome:"linear-gradient(#BFE0F4,#fff)",buddyName:"#EDEDF3",displayName:"#EDEDF3",theme:"#EAF6CF",goals:"#EAF6CF",look:"#D9E3FB",ready:"#E4F3B8"},bn="";
+function onbActive(){return !state.profile.onboardingComplete||state.onb.replay}
+function go(step){var a=STEPS.indexOf(state.onb.step),b=STEPS.indexOf(step);state.onb.dir=b<a?"prev":"next";state.onb.step=step;state.onb.err="";renderOnb()}
+function rcRow(label,icon,on,action,id,role){return'<button class="rc'+(on?" done":"")+'" role="'+(role||"checkbox")+'" aria-checked="'+(!!on)+'" data-action="'+action+'" data-id="'+id+'"><span class="ic">'+ico(icon||"dot")+"</span>"+label+'<span class="ck">'+ico("check",16)+"</span></button>"}
+function popRc(el){el.classList.add("pop");setTimeout(function(){el.classList.remove("pop")},320)}
+function renderOnb(soft){var s=state.onb.step,p=state.profile,h="",q=["displayName","theme","goals","look"],t2=TINTS.filter(function(x){return x[0]===(p.avatarId||"blush")})[0];var tt=THEMES.filter(function(x){return x[0]===state.theme})[0]||THEMES[0],bgc=(s==="theme"||s==="goals"||s==="look")?tt[6]:s==="ready"?tt[4]:BG[s];onbEl.style.setProperty("--onb-bg",bgc);onbEl.style.background=bgc;
+var back=s==="welcome"||s==="ready"?'<span class="back" style="visibility:hidden"></span>':'<button class="back" aria-label="Back" data-action="onb-back">\u2039</button>';
+var hd='<div class="hd">'+back+(q.indexOf(s)>=0?'<div class="pg"><i style="width:'+Math.round((q.indexOf(s)+1)/q.length*100)+'%"></i></div>':"")+"</div>";
+function bub(x){return'<div class="row" style="width:100%;margin-top:14px"><span class="av" style="width:56px;height:56px">'+bunny({tint:t2[1],size:46,expr:"happy"})+'</span><div class="bub">'+x+"</div></div>"}
+if(s==="welcome"){h='<div style="position:relative;width:100%;height:210px"><div class="sticker" style="left:-6px;top:20px;transform:rotate(-6deg);background:#fff;border-radius:18px;padding:10px 12px;font-size:12px;font-weight:700">\u2713 morning<br>\u2713 water<br>\u25CB study<br><span class="pill" style="display:inline-block;margin-top:6px">12/20 done</span></div><span style="position:absolute;left:112px;top:36px;font:600 20px Caveat,cursive;color:#666">with your bunny \u2192</span><div class="sticker" style="right:-24px;top:0;background:#fff;border:5px solid #FF7057;border-radius:50%;width:120px;height:120px;display:grid;place-items:center;overflow:hidden">'+bunny({tint:"#F3A9C4",size:92,expr:"love"})+'</div><div class="sticker" style="left:-30px;top:130px;width:70px;height:70px;border-radius:50%;background:#3E86F5;color:#fff;display:grid;place-items:center;font:800 26px var(--df);animation-delay:-2s">+</div><div class="sticker" style="right:-26px;top:140px;width:70px;height:70px;border-radius:50%;background:#fff;border:6px solid #B7DC45;display:grid;place-items:center;font:800 15px var(--df);animation-delay:-3s">6:30</div></div><h1 class="hl xl" style="margin-top:0">Plan<br>your day,<br>your way</h1><button class="ob" data-action="onb-next" style="margin-top:auto">Get started</button>'+(p.displayName&&!state.onb.replay?"":'<span class="ol" data-action="onb-next">I already have an account</span>')+'<p style="font-size:11px;color:#999;text-align:center;margin-top:8px">By continuing you\'re accepting our <u>Terms of Use</u> and <u>Privacy Notice</u></p>'}
+else if(s==="buddyName"){if(!bn)bn=p.buddyName||NAMES[Math.floor(Math.random()*NAMES.length)];h='<div style="align-self:flex-end;margin-top:-30px">'+bunny({tint:t2[1],size:110,expr:"squint",pose:"wave"})+'</div><small style="color:#8C8A99">Name your bunny</small><input class="big" id="onbBuddy" maxlength="16" autofocus value="'+esc(bn)+'"><div class="row" style="margin-top:auto;width:100%;justify-content:space-between"><button class="back" style="width:60px;height:60px;border:2px solid #1B1B22;background:none" aria-label="Random name" data-action="onb-dice">\u2684</button><button class="ob" style="margin:0" data-action="onb-buddy">Next \u203A</button></div>'}
+else if(s==="displayName"){h=bub("What should I call you?")+'<input class="inp" id="onbName" maxlength="40" placeholder="Your name" style="font-size:22px;margin-top:40px" value="'+esc(p.displayName)+'"><div class="err">'+state.onb.err+'</div><button class="ob" data-action="onb-name">Next \u203A</button>'}
+else if(s==="theme"){h=bub("Pick your favorite color.")+'<div class="tgrid">';THEMES.forEach(function(t){h+='<button class="'+(state.theme===t[0]?"sel":"")+'" data-action="onb-theme" data-id="'+t[0]+'" aria-label="'+t[1]+'"><i style="background:'+t[4]+';--d:'+t[5]+'"></i>'+t[1]+"</button>"});h+='</div><div style="width:100%"><div class="rc done"><span class="ic">'+ico("book")+'</span>study or homework<span class="ck">'+ico("check",16)+'</span></div><div class="rc"><span class="ic">'+ico("water")+'</span>drink water<span class="ck">'+ico("check",16)+'</span></div></div><button class="ob" data-action="go-step" data-s="goals">Next \u203A</button>'}
+else if(s==="goals"){var gs=state.onb.goalsStage||"day";
+if(gs==="day"){h=bub("What does your day usually look like?")+'<div style="width:100%;margin-top:14px">';DAYTYPES.forEach(function(t){h+=rcRow(t[1],"dot",state.onb.dayType===t[0],"goals-day",t[0],"radio")});h+='</div><button class="ob" data-action="goals-day-next"'+(state.onb.dayType?"":" disabled")+'>Next \u203A</button><span class="ol" data-action="onb-skip-goals">Skip for now</span>'}
+else if(gs==="cats"){h=bub("What do you want to build routines around?")+'<div style="width:100%;margin-top:14px">';CATS.forEach(function(c){h+=rcRow(c[1],"dot",state.onb.cats.indexOf(c[0])>=0,"goals-cat",c[0])});h+='</div><button class="ob" data-action="goals-cats-next"'+(state.onb.cats.length?"":" disabled")+'>Next \u203A</button>'}
+else{h=bub("Here's a routine list to start you off.")+'<div style="width:100%;margin-top:8px">';["m","s","e"].forEach(function(k){var items=Object.keys(state.onb.sel).map(function(id){return libFind(id)}).filter(function(r){return r&&r[2]===k});if(!items.length)return;h+='<div class="lbl">'+GN[k]+"</div>";items.forEach(function(r){var on=state.onb.sel[r[0]];h+=rcRow(r[1],r[3],on,"goals-toggle",r[0])})});
+if(state.onb.custom.length){h+='<div class="lbl">your own</div>';state.onb.custom.forEach(function(r){h+=rcRow(r[1],r[3],true,"goals-remove-custom",r[0])})}
+h+='</div><span class="ol" data-action="goals-add-custom">+ Add your own</span><button class="ob" style="margin-top:16px" data-action="goals-finish">Set up my routines</button>'}}
+else if(s==="look"){h=bub("Pick your bunny's look.")+'<div class="grid">';TINTS.forEach(function(t){h+='<button class="'+(p.avatarId===t[0]?"sel":"")+'" data-action="onb-avatar" data-id="'+t[0]+'" aria-label="'+t[0]+'">'+bunny({tint:t[1],size:64,expr:"happy"})+"</button>"});h+='</div><button class="ob" data-action="go-step" data-s="ready"'+(p.avatarId?"":" disabled")+'>Next \u203A</button><span class="ol" data-action="onb-skip">Skip for now</span>'}
+else{h='<div style="margin-top:20px">'+bunny({tint:t2[1],size:150,expr:"happy",pose:"cheer"})+'</div><h1 class="hl">Your planner is ready.</h1><p class="sub">Let\'s turn your days into routines you can actually keep.</p><button class="ob" data-action="onb-finish">Open my planner</button>';setTimeout(confetti,200)}
+var st0=onbEl.scrollTop,oc0=soft&&onbEl.querySelector(".oc");if(oc0){morph(oc0,hd+h);return}onbEl.innerHTML='<div class="oc'+(soft?" still":state.onb.dir==="prev"?" prev":"")+'">'+hd+h+"</div>";onbEl.scrollTop=soft?st0:0}
+var cfd=false;function confetti(){if(cfd||state.onb.step!=="ready")return;cfd=true;var c=["#B7DC45","#FF7057","#3E86F5","#F5C85C"],i,e;for(i=0;i<16;i++){e=document.createElement("i");e.className="cf";e.style.left=Math.random()*100+"%";e.style.background=c[i%4];e.style.animationDelay=Math.random()*.6+"s";document.body.appendChild(e);setTimeout(function(x){x.remove()}.bind(null,e),3200)}setTimeout(function(){cfd=false},4000)}
+/* events */
+document.addEventListener("input",function(ev){var t=ev.target;if(!t.matches||!t.matches('input[data-action="fx-slide"]'))return;var k=t.getAttribute("data-k"),v=+t.value;state.fx[k]=v;t.style.setProperty("--val",Math.round((v-(+t.min))/((+t.max)-(+t.min))*100)+"%");applyFx(state.fx)});
+document.addEventListener("change",function(ev){var t=ev.target;if(!t.matches||!t.matches('input[data-action="fx-slide"]'))return;saveFx()});
+document.addEventListener("click",function(ev){var el=ev.target,a;while(el&&el!==document&&!(a=el.getAttribute&&el.getAttribute("data-action")))el=el.parentNode;if(!a||el===document)return;var g=function(k){return el.getAttribute(k)},m,p=state.profile;if(a.indexOf("p-")===0){P.act(a,g);return}
+switch(a){
+case"go":state.editR=false;state.view=g("data-v");render();scrollTo(0,0);break;
+case"select-month":state.m=+g("data-i");state.d=state.m===RM?RD:1;render();break;
+case"select-day":state.d=+g("data-d");render();break;
+case"toggle-routine":m=gm(state.m);var d=+g("data-d"),r=g("data-r"),ac2=activeCount(YEAR,state.m,d),was=dayDone(m,d)===ac2;m.routines[r][d-1]=!m.routines[r][d-1];state.pop=r+"-"+d;save();if(!was&&dayDone(m,d)===ac2)toast("Perfect day! "+(p.buddyName||"Your bunny")+" is so proud of you.");render();break;
+case"edit-routine":openRoutineForm("app",null,g("data-r"));break;
+case"toggle-edit-r":state.editR=!state.editR;render();break;
+case"add-routine":openRoutineForm("app",g("data-p")||"m");break;
+case"remove-routine":var rid=g("data-r"),rr=(p.routines||[]).filter(function(x){return x[0]===rid})[0];confirmBox('Remove "'+(rr?rr[1]:"this routine")+'"?',"It comes off your list going forward - past ticks are kept.",function(){p.routines=(p.routines||[]).filter(function(x){return x[0]!==rid});saveProfile();render()},"Remove");break;
+case"goals-day":state.onb.dayType=g("data-id");var rsD=onbEl.querySelectorAll('.rc[data-action="goals-day"]'),qd;for(qd=0;qd<rsD.length;qd++){var onD=rsD[qd]===el;rsD[qd].classList.toggle("done",onD);rsD[qd].setAttribute("aria-checked",onD)}popRc(el);var nxD=onbEl.querySelector(".ob");if(nxD)nxD.disabled=false;break;
+case"goals-day-next":state.onb.goalsStage="cats";renderOnb();break;
+case"goals-cat":var cid=g("data-id"),ci=state.onb.cats.indexOf(cid);if(ci>=0)state.onb.cats.splice(ci,1);else state.onb.cats.push(cid);var onC=ci<0;el.classList.toggle("done",onC);el.setAttribute("aria-checked",onC);popRc(el);var nxC=onbEl.querySelector(".ob");if(nxC)nxC.disabled=!state.onb.cats.length;break;
+case"goals-cats-next":var sug=suggestIds(state.onb.dayType,state.onb.cats),selObj={},customArr=[],existing=p.routines||[];if(existing.length){existing.forEach(function(r){if(libFind(r[0]))selObj[r[0]]=true;else customArr.push(r)});sug.forEach(function(id){if(!(id in selObj))selObj[id]=false})}else sug.forEach(function(id){selObj[id]=true});state.onb.sel=selObj;state.onb.custom=customArr;state.onb.goalsStage="list";renderOnb();break;
+case"goals-toggle":var tid=g("data-id"),onT=!state.onb.sel[tid];state.onb.sel[tid]=onT;el.classList.toggle("done",onT);el.setAttribute("aria-checked",onT);popRc(el);break;
+case"goals-add-custom":openRoutineForm("onboarding","m");break;
+case"goals-remove-custom":var rid2=g("data-id"),ci2=-1;state.onb.custom.forEach(function(c,ix){if(c[0]===rid2)ci2=ix});if(ci2>=0)state.onb.custom.splice(ci2,1);renderOnb(true);break;
+case"onb-skip-goals":if(!(p.routines&&p.routines.length)){p.routines=idsToRoutines(DEFAULT_IDS)}saveProfile();go("look");break;
+case"goals-finish":var chosen=Object.keys(state.onb.sel).filter(function(id){return state.onb.sel[id]});var oldR=p.routines||[];p.routines=idsToRoutines(chosen).map(function(r){return oldR.filter(function(o){return o[0]===r[0]})[0]||r}).concat(state.onb.custom);saveProfile();go("look");break;
+case"select-mood":m=gm(state.m);var i=+g("data-i");m.mood[state.d-1]=m.mood[state.d-1]===i?null:i;state.moodPop=i;save();render();break;
+case"toggle-sc":m=gm(state.m);m.selfcare[g("data-k")]=!m.selfcare[g("data-k")];save();render();break;
+case"toggle-task":m=gm(state.view==="home"?RM:state.m);m.tasks[g("data-k")]=!m.tasks[g("data-k")];save();render();break;
+case"wiggle":var sv=el.querySelector("svg");if(sv){sv.style.animation="wig .5s"}break;
+case"select-theme":applyTheme(g("data-id"));ls(K.t,state.theme);render();break;
+case"set-format":state.fmt=g("data-f");ls(K.f,state.fmt);render();break;
+case"fx-toggle":var fk=g("data-k");state.fx[fk]=state.fx[fk]?0:1;applyFx(state.fx);saveFx();render();break;
+case"toggle-reminders":if(p.remindersOn){p.remindersOn=false;saveProfile();render();Cloud.disableReminders()}else{p.remindersOn=true;saveProfile();render();Cloud.enableReminders().then(function(){toast("reminders on \ud83d\udc30");Cloud.watchForeground(function(payload){toast((payload.notification&&payload.notification.title)||"reminder")})}).catch(function(e){p.remindersOn=false;saveProfile();toast(ERR[e.code]||ERR.NETWORK);render()})}break;
+case"reset-month":confirmBox("Reset "+MF[state.m]+"?","All ticks, moods and notes for this month will be cleared.",function(){data.months[state.m]=emptyMonth();save();render()},"Reset");break;
+case"reset-all":confirmBox("Reset all months?","This clears every month on this device.",function(){data={months:{}};save();render()},"Reset all");break;
+case"export":var b=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),appData:data,partner:P.exportInfo(),theme:state.theme,progressFormat:state.fmt},null,1)],{type:"application/json"}),u=URL.createObjectURL(b),an=document.createElement("a");an.href=u;an.download="bunny-planner-backup.json";document.body.appendChild(an);an.click();an.remove();setTimeout(function(){URL.revokeObjectURL(u)},1000);break;
+case"save-name":p.displayName=document.getElementById("setName").value.trim();saveProfile();toast("Name saved");render();break;
+case"save-buddy":p.buddyName=document.getElementById("setBuddy").value.trim();saveProfile();toast("Buddy name saved");render();break;
+case"set-avatar":p.avatarId=g("data-id");saveProfile();render();break;
+case"replay":confirmBox("Replay welcome screens?","Your planner data stays untouched.",function(){state.onb={step:"welcome",dir:"next",err:"",replay:true};bn=p.buddyName;render()},"Replay");break;
+case"onb-next":go("buddyName");break;
+case"onb-back":if(state.onb.step==="goals"&&state.onb.goalsStage!=="day"){state.onb.goalsStage=state.onb.goalsStage==="list"?"cats":"day";renderOnb();break}var pv=STEPS[Math.max(0,STEPS.indexOf(state.onb.step)-1)];if(pv==="goals")state.onb.goalsStage="list";go(pv);break;
+case"onb-dice":var inp=document.getElementById("onbBuddy"),n;do{n=NAMES[Math.floor(Math.random()*NAMES.length)]}while(n===inp.value);inp.value=n;bn=n;break;
+case"onb-buddy":var v=document.getElementById("onbBuddy").value.trim();if(!v)return;p.buddyName=v;bn=v;saveProfile();go("displayName");break;
+case"onb-name":var nv=document.getElementById("onbName").value.trim();if(!nv){state.onb.err="Let me know what to call you.";renderOnb(true);return}p.displayName=nv;saveProfile();state.onb.goalsStage="day";state.onb.dayType=null;state.onb.cats=[];state.onb.sel={};state.onb.custom=[];go("theme");break;
+case"onb-theme":applyTheme(g("data-id"));ls(K.t,state.theme);var tbs=onbEl.querySelectorAll(".tgrid button"),tk;for(tk=0;tk<tbs.length;tk++)tbs[tk].className=tbs[tk].getAttribute("data-id")===state.theme?"sel":"";var tt2=THEMES.filter(function(x){return x[0]===state.theme})[0];onbEl.style.setProperty("--onb-bg",tt2[6]);onbEl.style.background=tt2[6];break;
+case"onb-avatar":p.avatarId=g("data-id");saveProfile();var gr=onbEl.querySelectorAll(".grid button"),k;for(k=0;k<gr.length;k++)gr[k].className=gr[k].getAttribute("data-id")===p.avatarId?"sel":"";var nb=onbEl.querySelector(".ob");if(nb)nb.disabled=false;break;
+case"onb-skip":p.avatarId=null;saveProfile();go("ready");break;
+case"go-step":go(g("data-s"));break;
+case"onb-finish":p.onboardingComplete=true;p.onboardingStage="done";state.onb.replay=false;saveProfile();state.view="home";state.last="";render();break;
+case"pcal-prev":P.cal.m--;if(P.cal.m<0){P.cal.m=11;P.cal.y--}P.calSel=null;render();P.loadCal();break;
+case"pcal-next":P.cal.m++;if(P.cal.m>11){P.cal.m=0;P.cal.y++}P.calSel=null;render();P.loadCal();break;
+case"pcal-day":var pk=g("data-k");P.calSel=P.calSel===pk?null:pk;render();break}});
+document.addEventListener("input",function(ev){var g=ev.target.getAttribute&&ev.target.getAttribute("data-g");if(g!==null&&g!==undefined){gm(RM).grateful[+g]=ev.target.value;if(state.view==="planner")gm(state.m).grateful[+g]=ev.target.value;save()}
+if(ev.target.id==="onbBuddy"){bn=ev.target.value;ev.target.style.fontSize=bn.length>10?"36px":""}});
+if(window.visualViewport){var kb=function(){onbEl.style.paddingBottom=Math.max(0,window.innerHeight-window.visualViewport.height)+"px"};window.visualViewport.addEventListener("resize",kb)}
+/* ===== CLOUD ADAPTER: the only place that touches Firebase (mock parts are marked MOCK and safe to delete) ===== */
+var Cloud=(function(){var db,auth,uid=null,ready=null,V="10.12.2";
+function cfg(){return !!(FIREBASE_CONFIG&&typeof FIREBASE_CONFIG==="object"&&FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId)}
+function ld(u){return new Promise(function(ok,no){var e=document.createElement("script");e.src=u;e.onload=ok;e.onerror=function(){no({code:"NETWORK"})};document.head.appendChild(e)})}
+function init(){if(!cfg())return Promise.resolve("mock");if(ready)return ready;var B="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.1/firebase-";ready=ld(B+"app-compat.min.js").then(function(){return Promise.all([ld(B+"auth-compat.min.js"),ld(B+"firestore-compat.min.js")])}).then(function(){firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();db=firebase.firestore();return auth.signInAnonymously()}).then(function(c){uid=c.user.uid;window.__dbgLog('Cloud.init: signed in, uid='+uid);return uid}).catch(function(e){ready=null;window.__dbgLog('Cloud.init FAILED: '+(e&&e.message||e));throw{code:"NETWORK"}});return ready}
+var AL="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function mkCode(){var c="",i;for(i=0;i<6;i++)c+=AL.charAt(Math.floor(Math.random()*AL.length));return c}
+function createPair(){var c=mkCode(),ex=Date.now()+864e5;if(!cfg())return Promise.resolve({code:c,expiresAt:ex});return init().then(function(u){return db.doc("pairCodes/"+c).set({creatorUid:u,expiresAt:ex,used:false,pairId:null})}).then(function(){return{code:c,expiresAt:ex}}).catch(function(){throw{code:"NETWORK"}})}
+function joinPair(code){if(!cfg()){/* MOCK */return new Promise(function(ok,no){setTimeout(function(){if(code.length!==6)no({code:"INVALID"});else ok({pairId:"mock",partnerUid:"mochi",mock:true})},600)})}
+return init().then(function(u){var ref=db.doc("pairCodes/"+code);return db.runTransaction(function(t){return t.get(ref).then(function(d){if(!d.exists)throw{code:"INVALID"};var x=d.data();if(x.creatorUid===u)throw{code:"OWN_CODE"};if(x.used)throw{code:"USED"};if(x.expiresAt<Date.now())throw{code:"EXPIRED"};var pid=db.collection("pairs").doc().id;t.set(db.doc("pairs/"+pid),{members:[x.creatorUid,u],createdAt:Date.now()});t.update(ref,{used:true,pairId:pid,joinerUid:u});return{pairId:pid,partnerUid:x.creatorUid}})})}).catch(function(e){throw e&&e.code?e:{code:"NETWORK"}})}
+function watchCode(code,cb){if(!cfg())return function(){};return db.doc("pairCodes/"+code).onSnapshot(function(d){var x=d.data();if(x&&x.used&&x.pairId)cb({pairId:x.pairId,partnerUid:x.joinerUid})})}
+function publish(pid,snap,evs){if(!cfg())return Promise.resolve();return init().then(function(u){window.__dbgLog('publish: writing snapshot to pairs/'+pid+'/snapshots/'+u+' + '+evs.length+' events, snap='+JSON.stringify(snap));var snapOut={};for(var k in snap)snapOut[k]=snap[k];if(snapOut.r)snapOut.r=JSON.stringify(snapOut.r);var b=db.batch();b.set(db.doc("pairs/"+pid+"/snapshots/"+u),snapOut);evs.forEach(function(e){e.by=u;b.set(db.collection("pairs/"+pid+"/events").doc(),e)});return b.commit()}).then(function(r){window.__dbgLog('publish: commit SUCCEEDED');return r}).catch(function(e){window.__dbgLog('publish: commit FAILED: '+(e&&e.message||e));throw e})}
+function subscribe(L,cb,err){if(!cfg())return mockSub(L,cb);window.__dbgLog('subscribe: listening to pairs/'+L.pairId+'/snapshots/'+L.partnerUid+' (my uid='+uid+')');var st={s:null,e:[]},u1,u2,go=function(){cb({snap:st.s,events:st.e})};
+u1=db.doc("pairs/"+L.pairId+"/snapshots/"+L.partnerUid).onSnapshot(function(d){var dt=d.exists?d.data():null;if(dt&&typeof dt.r==="string"){try{dt.r=JSON.parse(dt.r)}catch(e2){}}window.__dbgLog('subscribe: snapshot listener fired, exists='+d.exists+' data='+JSON.stringify(dt));st.s=dt;go()},function(e){window.__dbgLog('subscribe: snapshot listener ERROR: '+(e&&e.message||e));if(err)err(e)});
+u2=db.collection("pairs/"+L.pairId+"/events").orderBy("ts","desc").limit(30).onSnapshot(function(q){window.__dbgLog('subscribe: events listener fired, count='+q.docs.length);st.e=q.docs.map(function(d){return d.data()}).filter(function(e){return e.by!==uid});go()},function(e){window.__dbgLog('subscribe: events listener ERROR: '+(e&&e.message||e));if(err)err(e)});return function(){u1();u2()}}
+function sendCheer(pid,name){if(!cfg())return Promise.resolve();return init().then(function(u){return db.collection("pairs/"+pid+"/events").add({t:"cheer",x:name||"",ts:Date.now(),by:u})})}
+function unlink(pid){if(!cfg())return Promise.resolve();return init().then(function(){return db.doc("pairs/"+pid).delete()})}
+/* ---- push reminders (needs VAPID_KEY above + firebase-messaging-sw.js served at site root + Cloud Function deployed) ---- */
+var msgReady=null;
+function loadMessaging(){if(msgReady)return msgReady;var B="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.1/firebase-";msgReady=init().then(function(){return ld(B+"messaging-compat.min.js")}).catch(function(e){msgReady=null;throw e});return msgReady}
+function enableReminders(){if(!cfg())return Promise.reject({code:"UNSUPPORTED"});if(!("Notification"in window)||!("serviceWorker"in navigator))return Promise.reject({code:"UNSUPPORTED"});if(!VAPID_KEY||VAPID_KEY.indexOf("PASTE_")===0)return Promise.reject({code:"NO_VAPID"});
+return loadMessaging().then(function(){return navigator.serviceWorker.register("/firebase-messaging-sw.js")}).then(function(reg){return navigator.serviceWorker.ready.then(function(){return Notification.requestPermission()}).then(function(perm){if(perm!=="granted")throw{code:"DENIED"};return firebase.messaging().getToken({vapidKey:VAPID_KEY,serviceWorkerRegistration:reg})})}).then(function(token){if(!token)throw{code:"NO_TOKEN"};window.__dbgLog("reminders: got token, saving to pushTokens/"+uid);return db.doc("pushTokens/"+uid).set({token:token,updatedAt:Date.now()})}).catch(function(e){window.__dbgLog("reminders: enable FAILED: "+(e&&e.message||JSON.stringify(e)));throw e&&e.code?e:{code:"NETWORK"}})}
+function disableReminders(){if(!cfg()||!uid)return Promise.resolve();return db.doc("pushTokens/"+uid).delete().catch(function(){})}
+function watchForeground(cb){if(!cfg())return;loadMessaging().then(function(){firebase.messaging().onMessage(function(payload){cb(payload)})}).catch(function(){})}
+/* ---- day-history: one frozen doc per calendar date, keyed pairs/{pid}/history/{uid}/days/{YYYY-MM-DD} ---- */
+function publishDay(pid,dateKey,day){if(!cfg())return Promise.resolve();return init().then(function(u){window.__dbgLog('publishDay: writing pairs/'+pid+'/history/'+u+'/days/'+dateKey);var out={};for(var k in day)out[k]=day[k];if(out.r)out.r=JSON.stringify(out.r);return db.doc("pairs/"+pid+"/history/"+u+"/days/"+dateKey).set(out,{merge:true})}).then(function(r){window.__dbgLog('publishDay: SUCCEEDED');return r}).catch(function(e){window.__dbgLog('publishDay: FAILED: '+(e&&e.message||e))})}
+function fetchMonth(pid,partnerUid,y,mi){if(!cfg())return mockMonth(y,mi);var start=y+"-"+pad2(mi+1)+"-01",end=y+"-"+pad2(mi+1)+"-31";return init().then(function(){return db.collection("pairs/"+pid+"/history/"+partnerUid+"/days").where(firebase.firestore.FieldPath.documentId(),">=",start).where(firebase.firestore.FieldPath.documentId(),"<=",end).get()}).then(function(qs){var out={};qs.forEach(function(doc){var d=doc.data();if(d&&typeof d.r==="string"){try{d.r=JSON.parse(d.r)}catch(e2){}}out[doc.id]=d});return out}).catch(function(e){window.__dbgLog('fetchMonth: FAILED: '+(e&&e.message||e));return{}})}
+function mockMonth(y,mi){return Promise.resolve({})}
+/* ---- MOCK: simulated partner "Mochi" (delete this block when you no longer need the demo) ---- */
+var MR=[["m1","drink water morning","water","m"],["m2","breakfast on time","cup","m"],["s1","study or homework","book","s"],["s2","lunch on time","bowl","s"],["s3","drink water school","water","s"],["e1","dinner","bowl","e"],["e2","skincare","flower","e"],["e3","sleep on time","moon","e"]];
+function mockBase(){return{n:"Mochi",b:"Biscuit",av:"blush",r:MR.map(function(r,i){return[r[0],r[1],r[2],r[3],i<2]}),mood:0,mp:41,st:3,tk:2,sc:3,gr:["my tea was warm"],la:Date.now()}}
+function mockSub(L,cb){var S=L.snap&&L.mock?L.snap:mockBase(),E=L.events&&L.events.length?L.events:[{t:"tick",x:"breakfast on time",ts:Date.now()-6e5,by:"mochi"}];cb({snap:S,events:E});
+var iv=setInterval(function(){var left=S.r.filter(function(r){return!r[4]}),ev;if(left.length&&Math.random()<.75){var r=left[Math.floor(Math.random()*left.length)];r[4]=true;ev={t:"tick",x:r[1],ts:Date.now()}}else{S.mood=Math.floor(Math.random()*6);ev={t:"mood",x:MO[S.mood][0],ts:Date.now()}}
+if(S.r.every(function(r){return r[4]}))ev={t:"perfect",x:"",ts:Date.now()};S.la=Date.now();E=[ev].concat(E).slice(0,30);cb({snap:S,events:E,mock:true})},2e4);return function(){clearInterval(iv)}}
+return{demo:function(){return!cfg()},configured:cfg,init:init,createPair:createPair,joinPair:joinPair,watchCode:watchCode,publish:publish,subscribe:subscribe,sendCheer:sendCheer,unlink:unlink,publishDay:publishDay,fetchMonth:fetchMonth,enableReminders:enableReminders,disableReminders:disableReminders,watchForeground:watchForeground}})();
+/* ===== PARTNER (UI + sync logic; talks only to Cloud) ===== */
+var PK="bunnyPlanner:partner",ERR={INVALID:"hmm, that code doesn't look right. check it and try again.",EXPIRED:"that code hopped away (expired). ask for a fresh one.",USED:"that code was already used. ask for a new one.",OWN_CODE:"that's your own code! share it with your partner instead.",NETWORK:"can't reach the cloud right now. check your connection.",NOT_CONFIGURED:"cloud not connected yet.",DENIED:"notifications are blocked - enable them for this app in your phone's settings.",UNSUPPORTED:"this browser doesn't support notifications.",NO_VAPID:"reminders aren't set up yet on this build.",NO_TOKEN:"couldn't register this device for notifications. try again."};
+var P={link:null,code:null,share:{routines:1,progress:1,mood:0,grat:0},unseen:false,cheerAt:0,busy:false,off:null,unsub:null,unw:null,prev:null,pend:false,tm:null,hop:false,cal:{y:YEAR,m:RM},calCache:null,calSel:null,calLoading:false,moodPop:null};
+window.__P=P;window.__Cloud=Cloud;window.__FBCFG=FIREBASE_CONFIG;
+function ago(t){if(!t)return"a while ago";var x=Math.max(0,(Date.now()-t)/1e3);return x<60?"just now":x<3600?Math.floor(x/60)+" min ago":x<86400?Math.floor(x/3600)+"h ago":Math.floor(x/86400)+"d ago"}
+function tint(id){var t=TINTS.filter(function(x){return x[0]===id})[0];return t?t[1]:"#F3A9C4"}
+P.persist=function(){var L=P.link;ls(PK,JSON.stringify({link:L,code:P.code,share:P.share}))};
+P.exportInfo=function(){var L=P.link;return L?{paired:true,pairId:L.pairId,demo:!!L.mock,partner:L.snap?L.snap.n:null}:{paired:false}};
+P.snap=function(){var p=state.profile,m=gm(RM),sh=P.share,rs=(p.routines||[]).filter(function(r){return routineOnDay(r,YEAR,RM,RD)}),o={n:p.displayName||"bunny",b:p.buddyName||"",av:p.avatarId||"",acc:state.theme,la:Date.now()};
+if(sh.routines)o.r=rs.map(function(r){return[r[0],r[1],r[3],r[2],!!(m.routines[r[0]]&&m.routines[r[0]][RD-1])]});
+if(sh.progress){o.p=pct(dayDone(m,RD)/activeCount(YEAR,RM,RD));o.mp=pct(monthTotal(m,RM)/monthExpected(RM));o.st=streak(m,RD);o.tk=TK.filter(function(t){return m.tasks[t[0]]}).length;o.sc=SC.filter(function(t){return m.selfcare[t[0]]}).length}
+if(sh.mood&&m.mood[RD-1]!=null)o.mood=m.mood[RD-1];if(sh.grat)o.gr=m.grateful.filter(Boolean);return o};
+P.events=function(o){var ev=[],pv=P.prev,m=gm(RM);if(pv&&o.r)o.r.forEach(function(r){if(r[4]&&pv.r&&pv.r[r[0]]===false)ev.push({t:"tick",x:r[1],ts:Date.now()})});
+if(pv&&o.mood!=null&&o.mood!==pv.mood)ev.push({t:"mood",x:MO[o.mood][0],ts:Date.now()});if(pv&&o.p===100&&pv.p!==100)ev.push({t:"perfect",x:"",ts:Date.now()});
+P.prev={r:{},mood:o.mood,p:o.p};(o.r||[]).forEach(function(r){P.prev.r[r[0]]=r[4]});return ev};
+P.changed=function(){var L=P.link;if(!L){window.__dbgLog('P.changed: no link, not syncing');return}if(L.mock){window.__dbgLog('P.changed: mock link, not syncing');return}if(L.dead){window.__dbgLog('P.changed: link marked dead, not syncing');return}clearTimeout(P.tm);P.tm=setTimeout(P.flush,1500)};
+P.flush=function(){var L=P.link;if(!L||L.mock||L.dead)return;if(!navigator.onLine){window.__dbgLog('P.flush: offline, queuing');P.pend=true;return}var o=P.snap(),ev=P.events(o);window.__dbgLog('P.flush: sharing flags='+JSON.stringify(P.share));Cloud.publish(L.pairId,o,ev).then(function(){P.pend=false}).catch(function(){P.pend=true});Cloud.publishDay(L.pairId,localDateKey(new Date()),o).catch(function(){})};
+window.addEventListener("online",function(){if(P.pend)P.flush();P.paint()});window.addEventListener("offline",function(){P.paint()});
+P.paint=function(){if(state.view==="partner")render()};
+P.onData=function(d){var L=P.link;if(!L)return;window.__dbgLog('P.onData: received snap='+JSON.stringify(d.snap)+' events='+(d.events||[]).length);var old=L.events&&L.events[0]?L.events[0].ts:0,ne=(d.events||[]).filter(function(e){return e.ts>old&&e.by!==L.uid});L.snap=d.snap||L.snap;L.events=d.events||L.events;L.at=Date.now();P.persist();
+if(ne.length&&old){var e=ne[0],nm=(L.snap&&L.snap.n)||"your partner";if(state.view!=="partner"){P.unseen=true;toast(e.t==="tick"?nm+" ticked '"+e.x+"'":e.t==="cheer"?nm+" sent you a cheer!":e.t==="mood"?nm+" is feeling "+e.x:nm+" had a perfect day!")}}P.render2()};
+P.render2=function(){if(!onbActive())render()};
+P.loadCal=function(){var L=P.link;if(!L)return;var key=P.cal.y+"-"+P.cal.m;if(P.calCache&&P.calCache.key===key)return;P.calLoading=true;Cloud.fetchMonth(L.pairId,L.partnerUid,P.cal.y,P.cal.m).then(function(map){P.calCache={key:key,data:map};P.calLoading=false;P.render2()}).catch(function(){P.calLoading=false;P.render2()})};
+P.connect=function(l){P.link=l;P.code=null;P.calCache=null;P.calSel=null;P.cal={y:YEAR,m:RM};P.persist();P.attach();P.flush();render()};
+P.attach=function(){if(P.unsub)P.unsub();var L=P.link;if(!L)return;L.dead=false;P.unsub=Cloud.subscribe(L,P.onData,function(){L.dead=true;P.render2()})};
+P.start=function(){var raw;try{raw=JSON.parse(ls(PK)||"null")}catch(e){}if(raw){P.code=raw.code;for(var k in raw.share)P.share[k]=raw.share[k];P.link=raw.link;if(P.link&&P.link.mock&&Cloud.configured()){P.link=null;P.persist()}}
+if(P.link){
+  if(P.link.mock){
+    P.attach();
+  }else{
+    Cloud.init()
+      .then(function(){
+        P.attach();
+      })
+      .catch(function(e){
+        console.warn("bunny planner: partner cloud init failed",e);
+        P.render2();
+      });
+  }
+}
+if(P.code&&P.code.expiresAt>Date.now()&&Cloud.configured()&&!P.link){
+  Cloud.init().then(function(){
+    P.wc();
+  }).catch(function(e){
+    console.warn("bunny planner: partner code cloud init failed",e);
+  });
+}
+setInterval(function(){if(state.view==="partner"&&!document.hidden)render()},3e4)};
+P.wc=function(){if(P.unw)P.unw();if(P.code)P.unw=Cloud.watchCode(P.code.code,function(r){P.connect({pairId:r.pairId,uid:null,partnerUid:r.partnerUid,snap:null,events:[]})})};
+P.enterBox=function(err){var e=document.getElementById("modal");e.innerHTML='<div class="box"><b style="font:800 17px var(--df)">enter partner\'s code</b><input class="inp" id="pcode" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="ABC234" style="font:800 28px var(--df);text-align:center;letter-spacing:6px;text-transform:uppercase"><p id="perr" style="color:#C0392B;min-height:20px;font-weight:700">'+esc(err||"")+'</p><div class="row"><button class="btn ghost" data-action="m-no">Cancel</button><button class="btn" data-action="p-join" id="pgo">Connect</button></div></div>';e.className="show";e.onclick=function(ev){if(ev.target===e||ev.target.getAttribute("data-action")==="m-no")e.className=""}};
+document.addEventListener("input",function(ev){if(ev.target.id==="pcode")ev.target.value=ev.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"")});
+P.act=function(a,g){var L=P.link;
+if(a==="p-gen"){P.busy=true;render();Cloud.createPair().then(function(c){P.code=c;P.busy=false;P.persist();P.wc();render()}).catch(function(e){P.busy=false;toast(ERR[e.code]||ERR.NETWORK);render()})}
+else if(a==="p-enter")P.enterBox();
+else if(a==="p-join"){var v=document.getElementById("pcode").value.trim().toUpperCase(),b=document.getElementById("pgo");if(!v){document.getElementById("perr").textContent=ERR.INVALID;return}b.textContent="connecting...";b.disabled=true;
+Cloud.joinPair(v).then(function(r){document.getElementById("modal").className="";Cloud.init().then(function(u){P.connect({pairId:r.pairId,uid:u,partnerUid:r.partnerUid,mock:!!r.mock,snap:null,events:[]});toast("connected!")})}).catch(function(e){P.enterBox(ERR[e.code]||ERR.NETWORK)})}
+else if(a==="p-copy"&&P.code){try{navigator.clipboard.writeText(P.code.code);toast("code copied")}catch(e){toast("long-press the code to copy")}}
+else if(a==="p-share"&&P.code){var t="join me on bunny's planner! my code: "+P.code.code;if(navigator.share)navigator.share({text:t}).catch(function(){});else{try{navigator.clipboard.writeText(t);toast("message copied")}catch(e){}}}
+else if(a==="p-cheer"&&L){if(Date.now()-P.cheerAt<6e4){toast("one cheer a minute, little hopper");return}P.cheerAt=Date.now();P.hop=true;Cloud.sendCheer(L.pairId,state.profile.displayName).catch(function(){});toast("cheer sent!");render();setTimeout(function(){P.hop=false;render()},800)}
+else if(a==="p-tog"){var k=g("data-k");P.share[k]=P.share[k]?0:1;P.persist();P.flush();render()}
+else if(a==="p-unlink")confirmBox("Unlink?","Syncing stops on both sides. Nobody's own planner data is deleted.",function(){var id=L&&L.pairId;if(P.unsub)P.unsub();P.unsub=null;P.link=null;P.prev=null;P.calCache=null;P.calSel=null;P.persist();if(id)Cloud.unlink(id).catch(function(){});render()},"Unlink")};
+function calendarHTML(){var y=P.cal.y,mi=P.cal.m,nd=new Date(y,mi+1,0).getDate(),first=new Date(y,mi,1).getDay(),cache=P.calCache&&P.calCache.key===(y+"-"+mi)?P.calCache.data:null,todayKey=dateKeyOf(YEAR,RM,RD);
+var h='<div class="lbl">their day-by-day</div><div class="card"><div class="calhead"><button data-action="pcal-prev" aria-label="Previous month" style="font:800 18px var(--df)">\u2039</button><b style="font:800 15px var(--df)">'+MF[mi]+" "+y+'</b><button data-action="pcal-next" aria-label="Next month" style="font:800 18px var(--df)">\u203a</button></div>';
+h+='<div class="calgrid caldow">';["S","M","T","W","T","F","S"].forEach(function(w){h+='<div class="cw">'+w+"</div>"});h+="</div>";
+h+='<div class="calgrid">';for(var i=0;i<first;i++)h+='<div class="cd empty"></div>';
+for(var d=1;d<=nd;d++){var k=dateKeyOf(y,mi,d),has=cache&&cache[k];h+='<button class="cd'+(has?" has":"")+(k===todayKey?" today":"")+(P.calSel===k?" sel":"")+'" data-action="pcal-day" data-k="'+k+'">'+d+"</button>"}
+h+="</div>";if(P.calLoading)h+='<div class="sk" style="margin-top:10px"></div>';h+="</div>";
+if(P.calSel)h+=calDetailHTML(cache&&cache[P.calSel]);
+return h}
+function calDetailHTML(day){var h='<div class="card" style="margin-top:8px"><b style="font:800 15px var(--df)">'+P.calSel+"</b>";
+if(!day){h+='<p style="color:var(--ink-soft);margin-top:6px">'+(P.calLoading?"loading...":"no data shared for this day")+"</p>"}
+else{if(day.r&&day.r.length){var dn2=day.r.filter(function(r){return r[4]}).length;h+='<div class="lbl" style="margin:10px 4px 4px">routines - '+dn2+"/"+day.r.length+"</div>";day.r.forEach(function(r){h+='<div class="rc'+(r[4]?" done":"")+'"><span class="ic">'+ico(r[2],16)+"</span>"+esc(r[1])+'<span class="ck">'+(r[4]?ico("check",14):"")+"</span></div>"})}
+if(day.mood!=null&&MO[day.mood]){h+='<div class="lbl" style="margin:10px 4px 4px">mood</div><div class="row">'+mood(day.mood,40)+'<b style="margin-left:8px">'+MO[day.mood][0]+"</b></div>"}
+if(day.gr&&day.gr.length){h+='<div class="lbl" style="margin:10px 4px 4px">grateful for</div>';day.gr.forEach(function(x){h+='<div class="note">'+esc(x)+"</div>"})}
+if(!(day.r&&day.r.length)&&day.mood==null&&!(day.gr&&day.gr.length))h+='<p style="color:var(--ink-soft);margin-top:6px">nothing shared for this day</p>'}
+return h+"</div>"}
+function vPartner(){P.unseen=false;var L=P.link,h="<h1>Partner</h1>",S=L&&L.snap,off=!navigator.onLine;
+if(Cloud.demo())h+='<div class="pbn">preview mode: cloud not connected yet. you\'re seeing a demo partner. try code DEMO12.</div>';
+if(!L){h+='<div class="card big blk halo" style="text-align:center;margin-top:14px">'+bunny({size:110,tint:tint(state.profile.avatarId),expr:"happy"})+'<p style="margin:10px 0 14px">connect with your partner to cheer each other on</p>';
+if(P.code&&P.code.expiresAt>Date.now()){var l=P.code.expiresAt-Date.now();h+='<div class="pcode">'+esc(P.code.code)+'</div><small>expires in '+Math.floor(l/36e5)+'h '+Math.floor(l%36e5/6e4)+'m. waiting for your partner...</small><div class="row" style="margin:12px 0"><button class="btn lime pt" data-action="p-copy">Copy</button></div>'}
+else h+='<button class="btn lime pt" data-action="p-gen" style="margin-bottom:8px">'+(P.busy?"making a code...":"Generate my code")+'</button>';
+return h+'<button class="btn ghost pt" data-action="p-enter">Enter partner\'s code</button></div>'}
+if(L.dead)return h+'<div class="card"><b>pairing ended</b><p>this link expired or your partner unlinked.</p><button class="btn dng pt" data-action="p-unlink">Clear link</button></div>';
+if(off)h+='<div class="pbn">offline: showing last update '+ago(L.at)+'</div>';
+if(!S)return h+'<div class="card"><b>connected! waiting for the first update</b><div class="sk"></div><div class="sk" style="width:60%"></div></div>'+sharing();
+var on=Date.now()-S.la<3e5,rs=S.r,dn=rs?rs.filter(function(r){return r[4]}).length:0,td=S.p!=null?S.p:rs?Math.round(dn/(rs.length||1)*100):null,myM=gm(RM),myStreak=streak(myM,RD),myPct=pct(dayDone(myM,RD)/activeCount(YEAR,RM,RD));
+h+='<div class="card big blk halo row pcard" style="margin-top:14px"><span class="'+(P.hop?"hop":"")+'">'+bunny({size:52,tint:tint(S.av),expr:S.mood!=null&&MO[S.mood]&&(S.mood===2||S.mood===5)?"glossy":"happy"})+'</span><div class="pcard-info"><b>'+esc(S.n)+'</b><div class="pcard-status"><i class="odot'+(on?" on":"")+'"></i><span>'+(on?"online now":"active "+ago(S.la))+'</span></div>'+(S.b?'<div class="pcard-buddy">buddy - '+esc(S.b)+'</div>':'')+(S.mood!=null&&MO[S.mood]?'<div class="pcard-mood">'+mood(S.mood,18)+'<span>feeling '+MO[S.mood][0]+'</span></div>':'')+'</div><button class="pill" data-action="p-unlink">Unlink</button></div>';
+P.loadCal();h+=calendarHTML();
+if(td!=null){h+='<div class="card row" style="margin-top:12px"><div class="ring" style="--ang:'+Math.round(td*3.6)+'deg;background:conic-gradient(var(--accent) var(--ang),rgba(255,255,255,.18) 0)"><div><span>'+td+'%<small>today</small></span></div></div><div style="flex:1;padding-left:12px"><b>today\'s progress</b><br><small>'+(rs?dn+" of "+rs.length+" routines":"")+'</small>';if(rs&&rs.length){h+='<div style="margin-top:10px">';["m","s","e"].forEach(function(k){var t=rs.filter(function(r){return r[3]===k});if(!t.length)return;var d2=t.filter(function(r){return r[4]}).length,p2=Math.round(d2/t.length*100);h+='<div class="pseg"><b>'+GN[k]+'</b><div class="pbar"><i style="width:'+p2+'%"></i></div><span>'+d2+'/'+t.length+'</span></div>'});h+='</div>'}h+='</div></div>'}
+h+='<div class="vs"><div class="vc"><b>'+ico("flame",16)+' '+myStreak+'</b><small>your streak</small></div><div class="vmid">vs</div><div class="vc"><b>'+ico("flame",16)+' '+(+S.st||0)+'</b><small>their streak</small></div></div>';
+if(rs){h+='<div class="lbl">their routines today</div>';["m","s","e"].forEach(function(k){var t=rs.filter(function(r){return r[3]===k});if(t.length){h+='<div class="grp"><span class="pill">'+GN[k]+'</span></div>';t.forEach(function(r){h+='<div class="rc'+(r[4]?" done":"")+'"><span class="ic">'+ico(r[2])+'</span>'+esc(r[1])+'<span class="ck">'+(r[4]?ico("check",16):"")+'</span></div>'})}})}
+if(S.mood!=null&&MO[S.mood])h+='<div class="lbl">mood today</div><div class="card" style="text-align:center">'+mood(S.mood,64)+'<br><b>'+MO[S.mood][0]+'</b></div>';
+if(S.st!=null)h+='<div class="tiles"><div class="tile l"><b style="font:800 30px var(--df)">'+ico("flame",18)+' '+(+S.st||0)+'</b>day streak</div><div class="tile k"><b style="font:800 30px var(--df)">'+(+S.mp||0)+'%</b>this month</div></div><div class="tiles"><div class="tile l"><b>self care</b>'+(+S.sc||0)+'/4</div><div class="tile k"><b>tasks</b>'+(+S.tk||0)+'/4</div></div>';
+h+='<div class="lbl">recent activity</div><div class="card">';var ev=L.events||[];if(!ev.length)h+='<small>no updates yet today</small>';ev.slice(0,8).forEach(function(e){var ic=e.t==="tick"?"check":e.t==="mood"?"star":e.t==="perfect"?"bolt":e.t==="cheer"?"heart":"dot",tx=e.t==="tick"?"ticked "+esc(e.x):e.t==="mood"?"is feeling "+esc(e.x):e.t==="perfect"?"had a perfect day!":e.t==="cheer"?"sent a cheer":"";h+='<div class="evrow"><span class="ic">'+ico(ic,14)+'</span><b>'+tx+'</b><small>'+ago(e.ts)+'</small></div>'});h+='</div>';
+if(S.gr&&S.gr.length){h+='<div class="lbl">grateful for</div>';S.gr.forEach(function(x){h+='<div class="note">'+esc(x)+'</div>'})}
+return h+'<button class="btn pt" data-action="p-cheer" style="margin-top:12px">'+ico("heart",16)+' Send a cheer</button>'+sharing()}
+function sharing(){var h='<div class="lbl">what i share</div><div class="card">';[["routines","routines"],["progress","progress stats"],["mood","mood"],["grat","gratitude"]].forEach(function(t){h+='<div class="row sp pt"><span>'+t[1]+'</span><button class="pill" data-action="p-tog" data-k="'+t[0]+'" role="switch" aria-checked="'+!!P.share[t[0]]+'">'+(P.share[t[0]]?"on":"off")+'</button></div>'});return h+'</div>'}
+
+/* boot */
+TABS.forEach(function(t){var b=document.createElement("button");b.setAttribute("data-action","go");b.setAttribute("data-v",t[0]);b.innerHTML=ico(t[2],19)+"<span>"+t[1]+"</span>";document.getElementById("nav").appendChild(b)});
+/* liquid-glass tab bar: blob follows a horizontal drag with elastic stretch, snaps to the nearest tab on release. Plain taps are left alone so the normal data-action="go" click handling still runs. */
+(function(){
+var navEl=document.getElementById("nav"),indEl=document.getElementById("ind");
+var touching=false,dragging=false,startX=0,startY=0,curX=0,prevX=0,blobX=0,stretch=0,navLeft=0,innerW=0,tabW=0,rafId=null,tabCount=TABS.length;
+var THRESH=8,FOLLOW=.32,STRETCH_EASE=.28,MAXSTRETCH=28,VELMUL=2.4;
+function clamp(v,a,b){return v<a?a:v>b?b:v}
+function idxOfView(v){var i=0;for(var j=0;j<TABS.length;j++)if(TABS[j][0]===v)i=j;return i}
+function highlight(i){var b=navEl.querySelectorAll("button");for(var j=0;j<b.length;j++)b[j].classList.toggle("on",j===i)}
+function measure(){var r=navEl.getBoundingClientRect();navLeft=r.left+4;innerW=r.width-8;tabW=innerW/tabCount}
+function paint(cx,st){var w=tabW+st,sq=st*.22;indEl.style.width=w+"px";indEl.style.left=(cx-w/2)+"px";indEl.style.top=(4+sq)+"px";indEl.style.bottom=(4+sq)+"px"}
+function tick(){
+if(!dragging){rafId=null;return}
+var target=clamp(curX-navLeft,tabW/2,innerW-tabW/2);
+blobX+=(target-blobX)*FOLLOW;
+var vel=target-prevX;prevX=target;
+var ts=Math.min(MAXSTRETCH,Math.abs(vel)*VELMUL);
+stretch+=(ts-stretch)*STRETCH_EASE;
+paint(blobX,stretch);
+highlight(clamp(Math.floor(blobX/tabW),0,tabCount-1));
+rafId=requestAnimationFrame(tick)
+}
+var lastTouchTime=0;
+function endDrag(cancel){
+touching=false;
+if(rafId){cancelAnimationFrame(rafId);rafId=null}
+indEl.classList.remove("press");
+if(!dragging)return;
+dragging=false;indEl.classList.remove("dragging");
+indEl.style.width="";indEl.style.left="";indEl.style.top="";indEl.style.bottom="";
+var idx=clamp(Math.floor(blobX/tabW),0,tabCount-1);
+if(!cancel){state.editR=false;state.view=TABS[idx][0];render();scrollTo(0,0)}
+else render()
+}
+navEl.addEventListener("touchstart",function(ev){
+var t=ev.touches[0];touching=true;dragging=false;startX=t.clientX;startY=t.clientY;curX=t.clientX;
+lastTouchTime=Date.now();indEl.classList.add("press");
+measure();var si=idxOfView(state.view);blobX=(si+.5)*tabW;prevX=blobX;stretch=0
+},{passive:true});
+navEl.addEventListener("touchmove",function(ev){
+if(!touching)return;var t=ev.touches[0];curX=t.clientX;
+if(!dragging&&Math.abs(t.clientX-startX)>THRESH&&Math.abs(t.clientX-startX)>Math.abs(t.clientY-startY)){
+dragging=true;indEl.classList.add("dragging");
+if(rafId==null)rafId=requestAnimationFrame(tick)
+}
+if(dragging)ev.preventDefault()
+},{passive:false});
+navEl.addEventListener("touchend",function(ev){if(dragging)ev.preventDefault();endDrag(false)},{passive:false});
+navEl.addEventListener("touchcancel",function(){endDrag(true)},{passive:true});
+/* mouse fallback so the same pop/drop bounce shows up when testing with a pointer instead of a finger */
+navEl.addEventListener("mousedown",function(){if(Date.now()-lastTouchTime<800)return;indEl.classList.add("press")});
+navEl.addEventListener("mouseup",function(){if(Date.now()-lastTouchTime<800)return;indEl.classList.remove("press")});
+navEl.addEventListener("mouseleave",function(){if(Date.now()-lastTouchTime<800)return;indEl.classList.remove("press")});
+})();
+load();P.start();
+if(state.profile.remindersOn)Cloud.enableReminders().then(function(){Cloud.watchForeground(function(payload){toast((payload.notification&&payload.notification.title)||"reminder")})}).catch(function(){});
+document.addEventListener("visibilitychange",function(){if(!document.hidden)checkDayRollover()});
+window.addEventListener("focus",checkDayRollover);
+setInterval(checkDayRollover,6e4);
+setTimeout(function(){render();document.body.classList.remove("booting");var s=document.getElementById("splash");s.className="hide";setTimeout(function(){s.remove()},600)},400);
+})();
+</script>
+</body></html>
