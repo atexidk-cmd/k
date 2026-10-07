@@ -24,9 +24,51 @@ jobs:
         run: |
           mkdir www
           cp index.html sw.js manifest.json icon-192.png icon-512.png www/
+          cat > www/native.js <<'EOF'
+          (function(){
+          var C=window.Capacitor;
+          if(!C||!C.isNativePlatform||!C.isNativePlatform())return;
+          var LN=C.Plugins&&C.Plugins.LocalNotifications;
+          if(!LN)return;
+          function N(){}
+          N.permission="default";
+          N.requestPermission=function(){return LN.requestPermissions().then(function(r){N.permission=r.display==="granted"?"granted":"denied";return N.permission})};
+          window.Notification=N;
+          LN.checkPermissions().then(function(r){if(r.display==="granted")N.permission="granted"}).catch(function(){});
+          function prof(){try{return JSON.parse(localStorage.getItem("bunnyPlannerProfile_v1")||"{}")||{}}catch(e){return{}}}
+          function mins(s){var a=String(s||"").split(":");return(+a[0]||0)*60+(+a[1]||0)}
+          function inQuiet(t,q){if(!q||!q.on)return false;var f=mins(q.from),e=mins(q.to);t=t%1440;return f<=e?(t>=f&&t<e):(t>=f||t<e)}
+          function slots(p){var m=mins(p.remMorning||"08:00"),n=mins(p.remNight||"21:30"),s={light:240,normal:180,often:120}[p.remFreq]||180,a=[m],t=m+s;while(t<n-60){a.push(t);t+=s}if(n>m)a.push(n);return a}
+          function sync(){
+          var p=prof();
+          return LN.createChannel({id:"bunny",name:"Check-ins",importance:4}).catch(function(){}).then(function(){return LN.getPending()}).then(function(r){
+          var old=(r&&r.notifications)||[];
+          return old.length?LN.cancel({notifications:old}):0}).then(function(){
+          if(!p.remindersOn)return;
+          var sl=slots(p),list=[],now=Date.now(),d,i;
+          for(d=0;d<7;d++){for(i=0;i<sl.length;i++){
+          if(inQuiet(sl[i],p.quiet))continue;
+          var at=new Date();at.setHours(0,0,0,0);at.setDate(at.getDate()+d);at.setMinutes(sl[i]);
+          if(at.getTime()<now+10000)continue;
+          var body=i===0?"Good morning! Ready for today's routines?":(i===sl.length-1?"Bedtime soon. Wind down and tick off your day.":"Quick check-in: how are your routines going?");
+          list.push({id:d*100+i+1,title:"Bunny",body:body,channelId:"bunny",schedule:{at:at,allowWhileIdle:true}})}}
+          return list.length?LN.schedule({notifications:list}):0})}
+          window.addEventListener("load",function(){
+          var Cl=window.__Cloud;
+          if(Cl){
+          Cl.enableReminders=function(test){return LN.requestPermissions().then(function(r){if(r.display!=="granted"){N.permission="denied";throw{code:"DENIED"}}N.permission="granted";return sync()}).then(function(){if(test)return LN.schedule({notifications:[{id:99999,title:"Bunny",body:"Nudges are on!",channelId:"bunny",schedule:{at:new Date(Date.now()+2000),allowWhileIdle:true}}]})})};
+          Cl.resyncReminders=function(){return sync().catch(function(){})};
+          Cl.disableReminders=function(){return sync().catch(function(){})};
+          }
+          var t;window.__remSync=function(){clearTimeout(t);t=setTimeout(function(){sync().catch(function(){})},1500)};
+          sync().catch(function(){});
+          });
+          })();
+          EOF
+          sed -i 's|<head>|<head><script src="native.js"></script>|' www/index.html
           npm init -y
-          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/status-bar@6
-          echo '{"appId":"io.github.atexidk.bunnyapp","appName":"Bunny","webDir":"www","plugins":{"StatusBar":{"overlaysWebView":true,"style":"LIGHT","backgroundColor":"#00000000"}}}' > capacitor.config.json
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/status-bar@6 @capacitor/local-notifications@6
+          echo '{"appId":"io.github.atexidk.bunnyapp","appName":"BunnyBuddy","webDir":"www","plugins":{"StatusBar":{"overlaysWebView":true,"style":"LIGHT","backgroundColor":"#00000000"}}}' > capacitor.config.json
           npx cap add android
           npx cap sync android
       - name: Build APK
