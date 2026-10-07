@@ -1,0 +1,25 @@
+name: Save key
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  save:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: bunny-debug-key-v1
+          fail-on-cache-miss: true
+      - name: Lock and save key
+        env:
+          KS_PASS: ${{ secrets.KS_PASS }}
+        run: |
+          openssl enc -aes-256-cbc -pbkdf2 -salt -in ~/.android/debug.keystore -out bunny.keystore.enc -pass env:KS_PASS
+          keytool -list -v -keystore ~/.android/debug.keystore -storepass android | grep -E "SHA1|SHA256"
+          git config user.name "bunny-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add bunny.keystore.enc
+          git commit -m "Save signing key (locked)"
+          git push
