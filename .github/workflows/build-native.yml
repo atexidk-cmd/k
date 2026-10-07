@@ -24,7 +24,7 @@ jobs:
         run: |
           sudo apt-get install -y imagemagick > /dev/null
           mkdir www
-          cp index.html sw.js manifest.json icon-192.png icon-512.png www/
+          cp index.html sw.js manifest.json icon-192.png icon-512.png extra.css www/
           cat > www/native.js <<'JSEOF'
           (function(){
           var C=window.Capacitor;
@@ -73,6 +73,7 @@ jobs:
           })();
           JSEOF
           sed -i 's|<head>|<head><script src="native.js"></script>|' www/index.html
+          sed -i 's|</head>|<link rel="stylesheet" href="extra.css"></head>|' www/index.html
           sed -i 's/env(safe-area-inset-top)/var(--sat,env(safe-area-inset-top))/g; s/env(safe-area-inset-bottom)/var(--sab,env(safe-area-inset-bottom))/g; s/env(safe-area-inset-left)/var(--sal,env(safe-area-inset-left))/g; s/env(safe-area-inset-right)/var(--sar,env(safe-area-inset-right))/g' www/index.html
           npm init -y
           npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/local-notifications@6
