@@ -4,18 +4,35 @@
   "name": "Bunny's Planner",
   "launcherName": "Bunny",
   "display": "standalone",
-  "orientation": "portrait",
-  "themeColor": "#C8E652",
+  "themeColor": "#000000",
+  "themeColorDark": "#000000",
   "navigationColor": "#000000",
-  "backgroundColor": "#F6F8EC",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#C8F135",
   "enableNotifications": true,
   "startUrl": "/k/",
   "iconUrl": "https://atexidk-cmd.github.io/k/icon-512.png",
   "maskableIconUrl": "https://atexidk-cmd.github.io/k/icon-512.png",
-  "appVersionName": "1.0.0",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1",
   "appVersionCode": 1,
-  "signingKey": { "path": "./android.keystore", "alias": "android" },
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
   "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
   "fullScopeUrl": "https://atexidk-cmd.github.io/k/",
-  "generatorApp": "bubblewrap-cli"
+  "minSdkVersion": 21,
+  "orientation": "portrait"
 }
