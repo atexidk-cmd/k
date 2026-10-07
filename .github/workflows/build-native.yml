@@ -22,12 +22,19 @@ jobs:
           key: bunny-debug-key-v1
       - name: Make app
         run: |
+          sudo apt-get install -y imagemagick > /dev/null
           mkdir www
           cp index.html sw.js manifest.json icon-192.png icon-512.png www/
-          cat > www/native.js <<'EOF'
+          cat > www/native.js <<'JSEOF'
           (function(){
           var C=window.Capacitor;
           if(!C||!C.isNativePlatform||!C.isNativePlatform())return;
+          function inset(){try{var a=String(window.BunnyNative.insets()).split(","),st=document.documentElement.style;st.setProperty("--sat",a[0]+"px");st.setProperty("--sab",a[1]+"px");st.setProperty("--sal",a[2]+"px");st.setProperty("--sar",a[3]+"px")}catch(e){}}
+          function bars(){try{window.BunnyNative.light(document.documentElement.dataset.theme!=="dark")}catch(e){}}
+          inset();bars();
+          [200,600,1500,3000].forEach(function(ms){setTimeout(function(){inset();bars()},ms)});
+          window.addEventListener("resize",inset);
+          try{new MutationObserver(bars).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]})}catch(e){}
           var LN=C.Plugins&&C.Plugins.LocalNotifications;
           if(!LN)return;
           function N(){}
@@ -64,12 +71,94 @@ jobs:
           sync().catch(function(){});
           });
           })();
-          EOF
+          JSEOF
           sed -i 's|<head>|<head><script src="native.js"></script>|' www/index.html
+          sed -i 's/env(safe-area-inset-top)/var(--sat,env(safe-area-inset-top))/g; s/env(safe-area-inset-bottom)/var(--sab,env(safe-area-inset-bottom))/g; s/env(safe-area-inset-left)/var(--sal,env(safe-area-inset-left))/g; s/env(safe-area-inset-right)/var(--sar,env(safe-area-inset-right))/g' www/index.html
           npm init -y
-          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/status-bar@6 @capacitor/local-notifications@6
-          echo '{"appId":"io.github.atexidk.bunnyapp","appName":"BunnyBuddy","webDir":"www","plugins":{"StatusBar":{"overlaysWebView":true,"style":"LIGHT","backgroundColor":"#00000000"}}}' > capacitor.config.json
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/local-notifications@6
+          echo '{"appId":"io.github.atexidk.bunnyapp","appName":"BunnyBuddy","webDir":"www","plugins":{"LocalNotifications":{"smallIcon":"ic_stat_bunny","iconColor":"#5A7A00"}}}' > capacitor.config.json
           npx cap add android
+          R=android/app/src/main/res
+          rm -rf $R/mipmap-anydpi-v26
+          find $R -name 'ic_launcher_foreground.*' -delete
+          for p in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            d=${p%%:*}; s=${p##*:}
+            mkdir -p $R/mipmap-$d
+            rm -f $R/mipmap-$d/ic_launcher.* $R/mipmap-$d/ic_launcher_round.*
+            convert icon-512.png -resize ${s}x${s} $R/mipmap-$d/ic_launcher.png
+            cp $R/mipmap-$d/ic_launcher.png $R/mipmap-$d/ic_launcher_round.png
+          done
+          mkdir -p $R/drawable
+          cat > $R/drawable/ic_stat_bunny.xml <<'XMLEOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+            <path android:fillColor="#FFFFFF" android:pathData="M6.7,6 a1.8,4.5 0 1,0 3.6,0 a1.8,4.5 0 1,0 -3.6,0 Z"/>
+            <path android:fillColor="#FFFFFF" android:pathData="M13.7,6 a1.8,4.5 0 1,0 3.6,0 a1.8,4.5 0 1,0 -3.6,0 Z"/>
+            <path android:fillColor="#FFFFFF" android:pathData="M5.5,15 a6.5,6.5 0 1,0 13,0 a6.5,6.5 0 1,0 -13,0 Z"/>
+          </vector>
+          XMLEOF
+          cat > android/app/src/main/java/io/github/atexidk/bunnyapp/MainActivity.java <<'JAVAEOF'
+          package io.github.atexidk.bunnyapp;
+
+          import android.graphics.Color;
+          import android.os.Build;
+          import android.os.Bundle;
+          import android.view.View;
+          import android.view.Window;
+          import android.view.WindowManager;
+          import android.webkit.JavascriptInterface;
+          import androidx.core.graphics.Insets;
+          import androidx.core.view.ViewCompat;
+          import androidx.core.view.WindowCompat;
+          import androidx.core.view.WindowInsetsCompat;
+          import androidx.core.view.WindowInsetsControllerCompat;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+            private volatile String insetsStr = "0,0,0,0";
+
+            public class BunnyBridge {
+              @JavascriptInterface
+              public String insets() { return insetsStr; }
+
+              @JavascriptInterface
+              public void light(final boolean l) {
+                runOnUiThread(new Runnable() {
+                  public void run() {
+                    Window w = getWindow();
+                    WindowInsetsControllerCompat c = WindowCompat.getInsetsController(w, w.getDecorView());
+                    c.setAppearanceLightStatusBars(l);
+                    c.setAppearanceLightNavigationBars(l);
+                  }
+                });
+              }
+            }
+
+            @Override
+            public void onCreate(Bundle savedInstanceState) {
+              super.onCreate(savedInstanceState);
+              Window w = getWindow();
+              WindowCompat.setDecorFitsSystemWindows(w, false);
+              w.setStatusBarColor(Color.TRANSPARENT);
+              w.setNavigationBarColor(Color.TRANSPARENT);
+              if (Build.VERSION.SDK_INT >= 29) {
+                w.setNavigationBarContrastEnforced(false);
+              }
+              if (Build.VERSION.SDK_INT >= 28) {
+                w.getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+              }
+              View root = findViewById(android.R.id.content);
+              ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+                Insets sb = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+                Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+                float d = getResources().getDisplayMetrics().density;
+                insetsStr = Math.round(sb.top / d) + "," + Math.round(sb.bottom / d) + "," + Math.round(sb.left / d) + "," + Math.round(sb.right / d);
+                v.setPadding(0, 0, 0, ime.bottom > sb.bottom ? ime.bottom : 0);
+                return insets;
+              });
+              getBridge().getWebView().addJavascriptInterface(new BunnyBridge(), "BunnyNative");
+            }
+          }
+          JAVAEOF
           npx cap sync android
       - name: Build APK
         run: cd android && ./gradlew assembleDebug
