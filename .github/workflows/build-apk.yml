@@ -15,6 +15,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Restore signing key
+        id: ks
+        uses: actions/cache@v4
+        with:
+          path: android.keystore
+          key: bunny-keystore-v1
       - name: Install Bubblewrap
         run: npm i -g @bubblewrap/cli
       - name: Fix SDK layout
@@ -22,9 +28,11 @@ jobs:
           mkdir -p $ANDROID_HOME/tools
           mkdir -p ~/.bubblewrap
           echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
-          cat ~/.bubblewrap/config.json
       - name: Make signing key
+        if: steps.ks.outputs.cache-hit != 'true'
         run: keytool -genkeypair -v -keystore android.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass bunny123456 -keypass bunny123456 -dname "CN=Bunny"
+      - name: Show fingerprint
+        run: keytool -list -v -keystore android.keystore -storepass bunny123456 | grep SHA256
       - name: Generate project
         run: bubblewrap update --skipVersionUpgrade
       - name: Build APK
