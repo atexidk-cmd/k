@@ -8,7 +8,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '17'
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools build-tools;34.0.0 platforms;android-34'
@@ -16,16 +16,13 @@ jobs:
         with:
           node-version: 20
       - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-      - name: Show SDK
+        run: npm i -g @bubblewrap/cli
+      - name: Fix SDK layout
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          ls "$ANDROID_HOME"
-          ls "$ANDROID_HOME/build-tools"
-      - name: Bubblewrap config
-        run: |
+          mkdir -p $ANDROID_HOME/tools
           mkdir -p ~/.bubblewrap
           echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+          cat ~/.bubblewrap/config.json
       - name: Make signing key
         run: keytool -genkeypair -v -keystore android.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass bunny123456 -keypass bunny123456 -dname "CN=Bunny"
       - name: Generate project
@@ -38,4 +35,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: bunny-apk
-          path: app-release-signed.apk
+          path: '*.apk'
