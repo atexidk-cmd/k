@@ -1,0 +1,21 @@
+{
+  "packageId": "io.github.atexidk.bunny",
+  "host": "atexidk-cmd.github.io",
+  "name": "Bunny's Planner",
+  "launcherName": "Bunny",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#C8E652",
+  "navigationColor": "#000000",
+  "backgroundColor": "#F6F8EC",
+  "enableNotifications": true,
+  "startUrl": "/k/",
+  "iconUrl": "https://atexidk-cmd.github.io/k/icon-512.png",
+  "maskableIconUrl": "https://atexidk-cmd.github.io/k/icon-512.png",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "signingKey": { "path": "./android.keystore", "alias": "android" },
+  "fallbackType": "customtabs",
+  "fullScopeUrl": "https://atexidk-cmd.github.io/k/",
+  "generatorApp": "bubblewrap-cli"
+}
