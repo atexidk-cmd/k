@@ -15,11 +15,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Restore debug key
-        uses: actions/cache@v4
-        with:
-          path: ~/.android/debug.keystore
-          key: bunny-debug-key-v1
+      - name: Restore signing key
+        env:
+          KS_PASS: ${{ secrets.KS_PASS }}
+        run: |
+          mkdir -p ~/.android
+          openssl enc -d -aes-256-cbc -pbkdf2 -in bunny.keystore.enc -out ~/.android/debug.keystore -pass env:KS_PASS
+          keytool -list -keystore ~/.android/debug.keystore -storepass android | head -6
       - name: Make app
         run: |
           sudo apt-get install -y imagemagick > /dev/null
