@@ -1,5 +1,5 @@
 (function(){
-var CH=100000,BK="rescueParts";
+var CH=15000,BK="rescueParts";
 function go(){
 var b=document.createElement("button");
 b.textContent="Data rescue";
