@@ -1,0 +1,27 @@
+name: Make key
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  make:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Create and lock key
+        env:
+          KS_PASS: ${{ secrets.KS_PASS }}
+        run: |
+          test ! -f bunny.keystore.enc
+          keytool -genkeypair -keystore debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 36500 -storepass android -keypass android -dname "CN=BunnyBuddy"
+          openssl enc -aes-256-cbc -pbkdf2 -salt -in debug.keystore -out bunny.keystore.enc -pass env:KS_PASS
+          keytool -list -v -keystore debug.keystore -storepass android | grep -E "SHA1|SHA256"
+          rm debug.keystore
+          git config user.name "bunny-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add bunny.keystore.enc
+          git commit -m "Save signing key (locked)"
+          git push
