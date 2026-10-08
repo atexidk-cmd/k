@@ -37,6 +37,20 @@ jobs:
           [200,600,1500,3000].forEach(function(ms){setTimeout(function(){inset();bars()},ms)});
           window.addEventListener("resize",inset);
           try{new MutationObserver(bars).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]})}catch(e){}
+          function gcred(){return new Promise(function(res,rej){window.__gsDone=function(tok,err){if(tok){try{res(firebase.auth.GoogleAuthProvider.credential(tok))}catch(e){rej(e)}}else{rej({code:err==="cancelled"?"auth/popup-closed-by-user":"auth/internal-error",message:String(err)})}};try{window.BunnyNative.googleSignIn()}catch(e){rej({code:"auth/internal-error",message:"native"})}})}
+          function gpatch(){
+          var fb=window.firebase;
+          if(!fb||!fb.apps||!fb.apps.length||!fb.auth)return false;
+          var a=fb.auth();
+          if(a.__bn)return true;
+          a.__bn=1;
+          a.signInWithPopup=function(){return gcred().then(function(c){return a.signInWithCredential(c)})};
+          function pu(u){if(!u||u.__bn)return;u.__bn=1;u.linkWithPopup=function(){return gcred().then(function(c){return u.linkWithCredential(c)})}}
+          pu(a.currentUser);
+          a.onAuthStateChanged(pu);
+          return true}
+          var gt=setInterval(function(){try{if(gpatch())clearInterval(gt)}catch(e){}},300);
+          setTimeout(function(){clearInterval(gt)},120000);
           var LN=C.Plugins&&C.Plugins.LocalNotifications;
           if(!LN)return;
           function N(){}
@@ -93,6 +107,10 @@ jobs:
                   }
               }
           }
+
+          dependencies {
+              implementation 'com.google.android.gms:play-services-auth:21.2.0'
+          }
           GRADLEEOF
           R=android/app/src/main/res
           rm -rf $R/mipmap-anydpi-v26
@@ -115,6 +133,7 @@ jobs:
           cat > android/app/src/main/java/io/github/atexidk/bunnyapp/MainActivity.java <<'JAVAEOF'
           package io.github.atexidk.bunnyapp;
 
+          import android.content.Intent;
           import android.graphics.Color;
           import android.os.Build;
           import android.os.Bundle;
@@ -128,9 +147,17 @@ jobs:
           import androidx.core.view.WindowInsetsCompat;
           import androidx.core.view.WindowInsetsControllerCompat;
           import com.getcapacitor.BridgeActivity;
+          import com.google.android.gms.auth.api.signin.GoogleSignIn;
+          import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+          import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+          import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+          import com.google.android.gms.common.api.ApiException;
+          import org.json.JSONObject;
 
           public class MainActivity extends BridgeActivity {
             private volatile String insetsStr = "0,0,0,0";
+            private static final int GS_CODE = 9001;
+            private static final String WEB_CLIENT_ID = "826013636032-tco3cfideg8msh1ae6secbt50lcr6ar3.apps.googleusercontent.com";
 
             public class BunnyBridge {
               @JavascriptInterface
@@ -146,6 +173,46 @@ jobs:
                     c.setAppearanceLightNavigationBars(l);
                   }
                 });
+              }
+
+              @JavascriptInterface
+              public void googleSignIn() {
+                runOnUiThread(new Runnable() {
+                  public void run() {
+                    try {
+                      GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(WEB_CLIENT_ID)
+                        .requestEmail()
+                        .build();
+                      final GoogleSignInClient gc = GoogleSignIn.getClient(MainActivity.this, gso);
+                      gc.signOut().addOnCompleteListener(t -> MainActivity.this.startActivityForResult(gc.getSignInIntent(), GS_CODE));
+                    } catch (Exception e) {
+                      deliver(null, "error");
+                    }
+                  }
+                });
+              }
+            }
+
+            private void deliver(final String tok, final String err) {
+              runOnUiThread(new Runnable() {
+                public void run() {
+                  String js = "window.__gsDone&&window.__gsDone(" + (tok == null ? "null" : JSONObject.quote(tok)) + "," + (err == null ? "null" : JSONObject.quote(err)) + ")";
+                  getBridge().getWebView().evaluateJavascript(js, null);
+                }
+              });
+            }
+
+            @Override
+            public void onActivityResult(int req, int res, Intent data) {
+              super.onActivityResult(req, res, data);
+              if (req == GS_CODE) {
+                try {
+                  GoogleSignInAccount a = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException.class);
+                  deliver(a.getIdToken(), null);
+                } catch (ApiException e) {
+                  deliver(null, e.getStatusCode() == 12501 ? "cancelled" : "code" + e.getStatusCode());
+                }
               }
             }
 
