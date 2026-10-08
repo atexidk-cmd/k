@@ -176,6 +176,10 @@ jobs:
           }
           JAVAEOF
           npx cap sync android
+      - name: Set app address
+        run: |
+          echo '{"appId":"io.github.atexidk.bunnyapp","appName":"BunnyBuddy","webDir":"www","server":{"hostname":"atexidk-cmd.github.io","androidScheme":"https","allowNavigation":["bunnybuddy-6622c.firebaseapp.com","accounts.google.com","*.google.com","*.googleapis.com","*.gstatic.com"]},"plugins":{"LocalNotifications":{"smallIcon":"ic_stat_bunny","iconColor":"#5A7A00"}}}' > capacitor.config.json
+          npx cap copy android
       - name: Build APK
         run: cd android && ./gradlew assembleDebug
       - name: Show APK fingerprint
