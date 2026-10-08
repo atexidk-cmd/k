@@ -19,14 +19,14 @@ jobs:
         env:
           KS_PASS: ${{ secrets.KS_PASS }}
         run: |
-          mkdir -p ~/.android
-          openssl enc -d -aes-256-cbc -pbkdf2 -in bunny.keystore.enc -out ~/.android/debug.keystore -pass env:KS_PASS
-          keytool -list -keystore ~/.android/debug.keystore -storepass android | head -6
+          openssl enc -d -aes-256-cbc -pbkdf2 -in bunny.keystore.enc -out $HOME/bunny.keystore -pass env:KS_PASS
+          echo "BUNNY_KS=$HOME/bunny.keystore" >> $GITHUB_ENV
+          keytool -list -v -keystore $HOME/bunny.keystore -storepass android | grep -E "SHA1|SHA256"
       - name: Make app
         run: |
           sudo apt-get install -y imagemagick > /dev/null
           mkdir www
-          cp index.html sw.js manifest.json icon-192.png icon-512.png extra.css www/
+          cp index.html sw.js manifest.json icon-192.png icon-512.png extra.css rescue.js www/
           cat > www/native.js <<'JSEOF'
           (function(){
           var C=window.Capacitor;
@@ -81,6 +81,19 @@ jobs:
           npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/local-notifications@6
           echo '{"appId":"io.github.atexidk.bunnyapp","appName":"BunnyBuddy","webDir":"www","plugins":{"LocalNotifications":{"smallIcon":"ic_stat_bunny","iconColor":"#5A7A00"}}}' > capacitor.config.json
           npx cap add android
+          cat >> android/app/build.gradle <<'GRADLEEOF'
+
+          android {
+              signingConfigs {
+                  debug {
+                      storeFile file(System.getenv("BUNNY_KS"))
+                      storePassword "android"
+                      keyAlias "androiddebugkey"
+                      keyPassword "android"
+                  }
+              }
+          }
+          GRADLEEOF
           R=android/app/src/main/res
           rm -rf $R/mipmap-anydpi-v26
           find $R -name 'ic_launcher_foreground.*' -delete
@@ -165,6 +178,8 @@ jobs:
           npx cap sync android
       - name: Build APK
         run: cd android && ./gradlew assembleDebug
+      - name: Show APK fingerprint
+        run: $ANDROID_HOME/build-tools/34.0.0/apksigner verify --print-certs android/app/build/outputs/apk/debug/app-debug.apk | grep -E "SHA-1|SHA-256"
       - uses: actions/upload-artifact@v4
         with:
           name: bunny-native
