@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo apt-get install -y imagemagick > /dev/null
           mkdir www
-          cp index.html sw.js manifest.json icon-192.png icon-512.png extra.css rescue.js www/
+          cp index.html sw.js manifest.json icon-192.png icon-512.png extra.css rescue.js bunny.css bunny.js www/
           cat > www/native.js <<'JSEOF'
           (function(){
           var C=window.Capacitor;
